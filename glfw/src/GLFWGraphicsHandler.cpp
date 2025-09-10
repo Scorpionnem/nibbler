@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 10:41:31 by mbatty            #+#    #+#             */
-/*   Updated: 2025/09/10 13:24:54 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/09/10 13:33:58 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ GLFWGraphicsHandler::GLFWGraphicsHandler()
 GLFWGraphicsHandler::~GLFWGraphicsHandler()
 {
 }
+
+std::vector<Input>	inputs;
 
 void GLFWGraphicsHandler::open(int mapSizeX, int mapSizeY)
 {
@@ -51,6 +53,20 @@ void GLFWGraphicsHandler::open(int mapSizeX, int mapSizeY)
 	}
 	glViewport(0, 0, this->_width, this->_height);
 
+	glfwSetKeyCallback(_data, [](GLFWwindow *, int key, int, int action, int)
+	{
+		if (key == GLFW_KEY_W && action == GLFW_PRESS)
+			inputs.push_back(Input::UP);
+		if (key == GLFW_KEY_S && action == GLFW_PRESS)
+			inputs.push_back(Input::DOWN);
+		if (key == GLFW_KEY_A && action == GLFW_PRESS)
+			inputs.push_back(Input::LEFT);
+		if (key == GLFW_KEY_D && action == GLFW_PRESS)
+			inputs.push_back(Input::RIGHT);
+		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+			inputs.push_back(Input::CLOSE);
+	});
+
 	glClearColor(0.6, 0.8, 1.0, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -73,6 +89,10 @@ void GLFWGraphicsHandler::render(GameState state)
 std::vector<Input> GLFWGraphicsHandler::getInputs()
 {
 	std::vector<Input>	res;
+
+	res = inputs;
+
+	inputs.clear();
 
 	return (res);
 }
