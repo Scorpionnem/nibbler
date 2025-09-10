@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 14:03:18 by mbatty            #+#    #+#             */
-/*   Updated: 2025/09/05 16:26:44 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/09/10 11:21:00 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ int	main(int ac, char **av)
 	{
 		Game	game(ac, av);
 
+		GraphicsHandler::getGraphicsHandler("glfw/glfw.so")->open();
 		game.start();
 	}
 	catch (std::exception &error)
