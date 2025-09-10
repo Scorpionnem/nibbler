@@ -6,82 +6,58 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 14:03:18 by mbatty            #+#    #+#             */
-/*   Updated: 2025/08/31 15:57:03 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/09/05 16:26:44 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <dlfcn.h>
 #include <functional>
 #include <iostream>
 #include "AudioHandler.hpp"
 #include "GraphicsHandler.hpp"
 
-using audioHandlerCreateFunc = AudioHandler *(*)();
-using graphicsHandlerCreateFunc = GraphicsHandler *(*)();
 
-static GraphicsHandler	*getGraphicsHandler(const char *path)
-{
-	void	*handle = dlopen(path, RTLD_LAZY);
-	if (!handle)
-		return (NULL);
+/*
 
-	graphicsHandlerCreateFunc func = (graphicsHandlerCreateFunc)dlsym(handle, "getHandler");
-	if (!func)
-	{
-		dlclose(handle);
-		return (NULL);
-	}
+./nibbler -j 10.11.6.6:8080
+./nibbler -h 8080 -w 20 -h 20
+./nibbler -w 20 -h 20
+
+-o -> options -> options.txt file
+
+-w -> Width -> int
+-h -> Height -> int
+
+-j -> Join a multiplayer game -> string ip:port
+-H -> Host a multiplayer game -> string port
+
+If no -j/-h, play a solo game
+
+*/
+
+	// getGraphicsHandler("sdl/sdl.so");
+	// AudioHandler	*audio = getAudioHandler("miniaudio/miniaudio.so");
+	// if (!audio)
+	// {
+	// 	std::cout << "Error" << std::endl;
+	// 	return (1);
+	// }
 	
-	return (func());
-}
+	// audio->playSound("miniaudio/caca.wav");
 
-static  AudioHandler	*getAudioHandler(const char *path)
+	// delete audio;
+
+#include "Game.hpp"
+
+int	main(int ac, char **av)
 {
-	void	*handle = dlopen(path, RTLD_LAZY);
-	if (!handle)
-		return (NULL);
-
-	audioHandlerCreateFunc func = (audioHandlerCreateFunc)dlsym(handle, "getHandler");
-	if (!func)
+	try
 	{
-		dlclose(handle);
-		return (NULL);
+		Game	game(ac, av);
+
+		game.start();
 	}
-
-	return (func());
-}
-
-struct Client
-{
-	int	fd;
-};
-
-class Server
-{
-	public:
-		Server()
-		{
-
-		}
-		~Server()
-		{
-			
-		}
-	private:
-		std::vector<Client>	_clients;
-};
-
-int	main(void)
-{
-	getGraphicsHandler("sdl/sdl.so");
-	AudioHandler	*audio = getAudioHandler("miniaudio/miniaudio.so");
-	if (!audio)
+	catch (std::exception &error)
 	{
-		std::cout << "Error" << std::endl;
-		return (1);
+		std::cout << "Error: " << error.what() << std::endl;
 	}
-	
-	audio->playSound("miniaudio/caca.wav");
-
-	delete audio;
 }

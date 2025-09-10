@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 13:25:10 by mbatty            #+#    #+#             */
-/*   Updated: 2025/08/31 13:25:15 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/09/05 16:25:57 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,5 +37,6 @@
 # include <fstream>
 # include <iostream>
 # include <filesystem>
+# include <dlfcn.h>
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 14:21:50 by mbatty            #+#    #+#             */
-/*   Updated: 2025/08/31 15:30:28 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/09/05 16:24:57 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,18 +15,29 @@
 
 # include "libs.hpp"
 
-class   AudioHandler
+using audioHandlerCreateFunc = class AudioHandler *(*)();
+
+class AudioHandler
 {
-    public:
-        AudioHandler()
-        {
-            std::cout << "created AudioHandler" << std::endl;
-        }
-        virtual ~AudioHandler()
-        {
-            std::cout << "deleted AudioHandler" << std::endl;
-        }
-        virtual bool playSound(const char *path) = 0;
+	public:
+		AudioHandler() {}
+		virtual ~AudioHandler() {}
+		virtual bool playSound(const char *path) = 0;
+		static class AudioHandler	*getAudioHandler(const char *path)
+		{
+			void	*handle = dlopen(path, RTLD_LAZY);
+			if (!handle)
+				return (NULL);
+		
+			audioHandlerCreateFunc func = (audioHandlerCreateFunc)dlsym(handle, "getHandler");
+			if (!func)
+			{
+				dlclose(handle);
+				return (NULL);
+			}
+		
+			return (func());
+		}
 };
 
 #endif
