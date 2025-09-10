@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 14:03:18 by mbatty            #+#    #+#             */
-/*   Updated: 2025/09/10 13:24:23 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/09/10 13:39:07 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,12 @@ int	main(int ac, char **av)
 
 		GraphicsHandler *caca = GraphicsHandler::getGraphicsHandler("glfw/glfw.so");
 		caca->open(40, 40);
-		caca->render(state);
+		for (int i = 0; i < 1000000; i++)
+			caca->render(state);
+			
+		std::vector<Input> cacacucu = caca->getInputs();
+		for (auto it = cacacucu.begin(); it != cacacucu.end(); it++)
+			std::cout << (int)*it << std::endl;
 		caca->close();
 		return (1);
 		game.start();

@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 10:41:31 by mbatty            #+#    #+#             */
-/*   Updated: 2025/09/10 13:33:58 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/09/10 13:38:45 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,9 @@ void GLFWGraphicsHandler::open(int mapSizeX, int mapSizeY)
 
 void GLFWGraphicsHandler::render(GameState state)
 {
+	glfwPollEvents();
+		
+return ;
 	for (auto it = state.map.begin(); it != state.map.end(); it++)
 	{
 		for (auto itt = it->begin(); itt != it->end(); itt++)
