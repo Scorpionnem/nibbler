@@ -1,11 +1,11 @@
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -MMD -MP -g
+CXXFLAGS = -Wall -Wextra -Werror -MMD -MP -g -fPIC
 
-INCLUDES = -I includes
+INCLUDES = -I includes/ -I ../includes/
 
-NAME = nibbler
+NAME = glfw.so
 
-SRCS = src/main.cpp src/Game/gameplay.cpp src/Game/parsing.cpp src/Game/start.cpp src/GraphicsHandler.cpp
+SRCS = src/entrypoint.cpp src/GLFWGraphicsHandler.cpp
 
 OBJDIR = obj
 OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)
@@ -17,7 +17,7 @@ re: fclean all
 
 $(NAME): $(OBJS)
 	@echo Compiling $(NAME)
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^ -shared
 
 $(OBJDIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
