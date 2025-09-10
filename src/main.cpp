@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 14:03:18 by mbatty            #+#    #+#             */
-/*   Updated: 2025/09/10 11:21:00 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/09/10 13:24:23 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,19 @@ int	main(int ac, char **av)
 	try
 	{
 		Game	game(ac, av);
+		GameState	state;
 
-		GraphicsHandler::getGraphicsHandler("glfw/glfw.so")->open();
+		state.map = {
+			{MapElement::GROUND, MapElement::GROUND, MapElement::GROUND, MapElement::GROUND},
+			{MapElement::GROUND, MapElement::GROUND, MapElement::GROUND, MapElement::GROUND},
+			{MapElement::GROUND, MapElement::GROUND, MapElement::GROUND, MapElement::GROUND},
+		};
+
+		GraphicsHandler *caca = GraphicsHandler::getGraphicsHandler("glfw/glfw.so");
+		caca->open(40, 40);
+		caca->render(state);
+		caca->close();
+		return (1);
 		game.start();
 	}
 	catch (std::exception &error)

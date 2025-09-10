@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 10:41:31 by mbatty            #+#    #+#             */
-/*   Updated: 2025/09/10 11:20:34 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/09/10 13:24:54 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ GLFWGraphicsHandler::~GLFWGraphicsHandler()
 {
 }
 
-bool GLFWGraphicsHandler::open()
+void GLFWGraphicsHandler::open(int mapSizeX, int mapSizeY)
 {
 	if (!glfwInit())
 		throw std::runtime_error("Failed to initialize glfw");
@@ -29,8 +29,8 @@ bool GLFWGraphicsHandler::open()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWmonitor	*monitor = NULL;
-	this->_width = 500;
-	this->_height = 500;
+	this->_width = 32 * mapSizeX;
+	this->_height = 32 * mapSizeY;
 	#if FULL_SCREEN
 		monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode	*monitorInfos = glfwGetVideoMode(monitor);
@@ -58,13 +58,16 @@ bool GLFWGraphicsHandler::open()
 	glFrontFace(GL_CW);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	return (true);
 }
 
-bool GLFWGraphicsHandler::render(GameState state)
+void GLFWGraphicsHandler::render(GameState state)
 {
+	for (auto it = state.map.begin(); it != state.map.end(); it++)
+	{
+		for (auto itt = it->begin(); itt != it->end(); itt++)
+			std::cout << (int)*itt << std::endl;
+	}
 	(void)state;
-	return (false);
 }
 
 std::vector<Input> GLFWGraphicsHandler::getInputs()
@@ -74,7 +77,8 @@ std::vector<Input> GLFWGraphicsHandler::getInputs()
 	return (res);
 }
 
-bool GLFWGraphicsHandler::close()
+void GLFWGraphicsHandler::close()
 {
-	return (true);
+	glfwDestroyWindow(this->_data);
+	glfwTerminate();
 }

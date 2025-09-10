@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 15:22:16 by mbatty            #+#    #+#             */
-/*   Updated: 2025/09/10 10:46:45 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/09/10 13:18:53 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,26 +63,26 @@ class	GraphicsHandler
 		GraphicsHandler(){}
 		virtual ~GraphicsHandler(){}
 
-		virtual	bool open() = 0;
-		virtual	bool render(GameState state) = 0;
+		virtual	void open(int mapSizeX, int mapSizeY) = 0;
+		virtual	void render(GameState state) = 0;
 		virtual	std::vector<Input> getInputs() = 0;
-		virtual	bool close() = 0;
+		virtual	void close() = 0;
 
 		static class GraphicsHandler	*getGraphicsHandler(const char *path);
 	private:
 };
 
-class	SDLGraphicsHandler
-{
-	public:
-		SDLGraphicsHandler(){}
-		~SDLGraphicsHandler(){}
+// class	SDLGraphicsHandler
+// {
+// 	public:
+// 		SDLGraphicsHandler(){}
+// 		~SDLGraphicsHandler(){}
 
-		bool open();
-		bool render(GameState state);
-		std::vector<Input> getInputs();
-		bool close();
-	private:
-};
+// 		bool open();
+// 		bool render(GameState state);
+// 		std::vector<Input> getInputs();
+// 		bool close();
+// 	private:
+// };
 
 #endif

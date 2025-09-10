@@ -11,7 +11,11 @@ OBJDIR = obj
 OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)
 DEPS = $(SRCS:%.cpp=$(OBJDIR)/%.d)
 
-all: $(NAME)
+all: glfw $(NAME)
+
+glfw:
+	@make -C glfw/ all --no-print-directory
+	@cp glfw/glfw.so .
 
 re: fclean all
 
@@ -35,6 +39,6 @@ fclean: clean
 run: $(NAME)
 	./$(NAME) avm/sample.avm
 
-.PHONY: all clean fclean run re
+.PHONY: all clean fclean run re glfw
 
 -include $(DEPS)

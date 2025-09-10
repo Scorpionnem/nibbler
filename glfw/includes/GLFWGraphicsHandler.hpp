@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 10:40:42 by mbatty            #+#    #+#             */
-/*   Updated: 2025/09/10 11:20:06 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/09/10 13:18:50 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,10 @@ class	GLFWGraphicsHandler : public GraphicsHandler
 		GLFWGraphicsHandler();
 		~GLFWGraphicsHandler();
 
-		bool open();
-		bool render(GameState state);
+		void open(int mapSizeX, int mapSizeY);
+		void render(GameState state);
 		std::vector<Input> getInputs();
-		bool close();
+		void close();
 	private:
 		GLFWwindow	*_data;
 		int			_height;
