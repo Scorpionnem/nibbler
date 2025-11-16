@@ -5,13 +5,13 @@ INCLUDES = -I includes
 
 NAME = nibbler
 
-SRCS = src/main.cpp src/Game/gameplay.cpp src/Game/parsing.cpp src/Game/start.cpp src/GraphicsHandler.cpp
+SRCS = src/main.cpp
 
 OBJDIR = obj
 OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)
 DEPS = $(SRCS:%.cpp=$(OBJDIR)/%.d)
 
-all: glfw $(NAME)
+all: $(NAME)
 
 glfw:
 	@make -C glfw/ all --no-print-directory

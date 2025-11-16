@@ -6,75 +6,153 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 14:03:18 by mbatty            #+#    #+#             */
-/*   Updated: 2025/09/10 13:39:07 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/11/16 09:45:30 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <functional>
-#include <iostream>
-#include "AudioHandler.hpp"
-#include "GraphicsHandler.hpp"
+# include <iostream>
+# include <string>
+# include <fstream>
+# include <sstream>
+# include <istream>
+# include <vector>
+# include <map>
+# include <unordered_map>
+# include <cmath>
+# include <unistd.h>
+# include <exception>
+# include <functional>
+# include <array>
+# include <algorithm>
+# include <deque>
+# include <memory>
+# include <csignal>
+# include <thread>
+# include <mutex>
+# include <atomic>
+# include <iomanip>
+# include <fstream>
+# include <iostream>
+# include <filesystem>
+# include <dlfcn.h>
 
+class	GameState
+{
+	public:
+		void	setWidth(int w)
+		{
+			if (w < MIN_WIDTH || w > MAX_WIDTH)
+				throw std::runtime_error("Invalid width");
+			_width = w;
+		}
+		void	setHeight(int h)
+		{
+			if (h < MIN_HEIGHT || h > MAX_HEIGHT)
+				throw std::runtime_error("Invalid height");
+			_height = h;
+		}
+	private:
+		static constexpr	int	MAX_WIDTH = 50;
+		static constexpr	int	MAX_HEIGHT = 50;
 
-/*
+		static constexpr	int	MIN_WIDTH = 10;
+		static constexpr	int	MIN_HEIGHT = 10;
 
-./nibbler -j 10.11.6.6:8080
-./nibbler -h 8080 -w 20 -h 20
-./nibbler -w 20 -h 20
+		int	_width = 0;
+		int	_height = 0;
+};
 
--o -> options -> options.txt file
+class	GraphicsDL
+{
+	public:
+		GraphicsDL() {}
+		virtual ~GraphicsDL() {}
 
--w -> Width -> int
--h -> Height -> int
+		virtual void	init(GameState &gameState) = 0;
+		virtual void	render() = 0;
+		virtual void	stop() = 0;
+	private:
+		GameState	_gameState;
+};
 
--j -> Join a multiplayer game -> string ip:port
--H -> Host a multiplayer game -> string port
+class	Nibbler
+{
+	public:
+		Nibbler() {}
+		~Nibbler() {}
 
-If no -j/-h, play a solo game
+		int	init(int ac, char **av)
+		{
+			if (!_checkArgs(ac, av))
+				return (1);
+			while (_running)
+			{
+				_running = false;
+			}
+			_stop();
+			return (0);
+		}
+	private:
+		GameState	_gameState;
+		bool	_running = true;
+		void	*_graphicsDLHandle = NULL;
 
-*/
+		using GraphicsDLGetFn = class GraphicsDL *(*)();
+		GraphicsDL	*_loadGraphicsDL(const char *path)
+		{
+			if (_graphicsDLHandle)
+			{
+				dlclose(_graphicsDLHandle);
+				_graphicsDLHandle = NULL;
+			}
 
-	// getGraphicsHandler("sdl/sdl.so");
-	// AudioHandler	*audio = getAudioHandler("miniaudio/miniaudio.so");
-	// if (!audio)
-	// {
-	// 	std::cout << "Error" << std::endl;
-	// 	return (1);
-	// }
-	
-	// audio->playSound("miniaudio/caca.wav");
+			_graphicsDLHandle = dlopen(path, RTLD_LAZY);
+			if (!_graphicsDLHandle)
+				return (NULL);
 
-	// delete audio;
+			GraphicsDLGetFn func = (GraphicsDLGetFn)dlsym(_graphicsDLHandle, "getHandler");
+			if (!func)
+			{
+				dlclose(_graphicsDLHandle);
+				return (NULL);
+			}
 
-#include "Game.hpp"
+			return (func());
+		}
+		void	_stop()
+		{
+			if (_graphicsDLHandle)
+				dlclose(_graphicsDLHandle);
+		}
+		int	_checkArgs(int ac, char **av)
+		{
+			if (ac < 3)
+			{
+				std::cerr << "Too few arguments" << std::endl;
+				_printUsage();
+				return (0);
+			}
+
+			try {
+				_gameState.setWidth(std::stoi(av[1]));
+				_gameState.setHeight(std::stoi(av[2]));
+			} catch (const std::exception &e) {
+				std::cerr << "Invalid width or height" << std::endl;
+				_printUsage();
+				return (0);
+			}
+
+			return (1);
+		}
+		void	_printUsage()
+		{
+			std::cout << "./nibbler <width: 10-100> <height: 10-100>" << std::endl;
+		}
+};
 
 int	main(int ac, char **av)
 {
-	try
-	{
-		Game	game(ac, av);
-		GameState	state;
+	Nibbler	nibbler;
 
-		state.map = {
-			{MapElement::GROUND, MapElement::GROUND, MapElement::GROUND, MapElement::GROUND},
-			{MapElement::GROUND, MapElement::GROUND, MapElement::GROUND, MapElement::GROUND},
-			{MapElement::GROUND, MapElement::GROUND, MapElement::GROUND, MapElement::GROUND},
-		};
-
-		GraphicsHandler *caca = GraphicsHandler::getGraphicsHandler("glfw/glfw.so");
-		caca->open(40, 40);
-		for (int i = 0; i < 1000000; i++)
-			caca->render(state);
-			
-		std::vector<Input> cacacucu = caca->getInputs();
-		for (auto it = cacacucu.begin(); it != cacacucu.end(); it++)
-			std::cout << (int)*it << std::endl;
-		caca->close();
-		return (1);
-		game.start();
-	}
-	catch (std::exception &error)
-	{
-		std::cout << "Error: " << error.what() << std::endl;
-	}
+	return (nibbler.init(ac, av));
 }
