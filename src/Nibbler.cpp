@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:08:40 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/16 13:09:58 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/16 14:22:38 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,23 @@ int	Nibbler::start(int ac, char **av)
 {
 	if (!_checkArgs(ac, av))
 		return (1);
-	_graphicsDL = _loadGraphicsDL("glfw/GLFW.so");
+	_graphicsDL = _loadGraphicsDL("./minilibx.so");
 	if (!_graphicsDL)
 		return (1);
+	_graphicsDL->open(_gameState);
 	while (_running)
 	{
-		_running = false;
+		GraphicsDL::Input	input;
+		do
+		{
+			input = _graphicsDL->getInput();
+			if (input == GraphicsDL::Input::CLOSE)
+			{
+				_running = false;
+				break ;
+			}
+		} while (input != GraphicsDL::Input::NONE);
+		_graphicsDL->render(_gameState);
 	}
 	_stop();
 	return (0);
@@ -30,12 +41,19 @@ int	Nibbler::start(int ac, char **av)
 
 void	Nibbler::_stop()
 {
+	if (_graphicsDL)
+		delete _graphicsDL;
 	if (_graphicsDLHandle)
 		dlclose(_graphicsDLHandle);
 }
 
 GraphicsDL	*Nibbler::_loadGraphicsDL(const char *path)
 {
+	if (_graphicsDL)
+	{
+		delete _graphicsDL;
+		_graphicsDL = NULL;
+	}
 	if (_graphicsDLHandle)
 	{
 		dlclose(_graphicsDLHandle);

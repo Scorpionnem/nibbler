@@ -1,7 +1,7 @@
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -MMD -MP -g
 
-INCLUDES = -I includes
+INCLUDES = -I includes -I includes/shared
 
 NAME = nibbler
 
@@ -12,7 +12,7 @@ OBJDIR = obj
 OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)
 DEPS = $(SRCS:%.cpp=$(OBJDIR)/%.d)
 
-all:
+all: minilibx
 	@make -j compile --no-print-directory
 
 compile: $(NAME)
@@ -20,6 +20,10 @@ compile: $(NAME)
 glfw:
 	@make -C glfw/ all --no-print-directory
 	@cp glfw/glfw.so .
+
+minilibx:
+	@make -C minilibx/ all --no-print-directory
+	@cp minilibx/minilibx.so .
 
 re: fclean all
 
@@ -34,15 +38,15 @@ $(OBJDIR)/%.o: %.cpp
 
 clean:
 	@echo Cleaning objects
+	@make -C minilibx clean
 	@rm -rf $(OBJDIR)
 
 fclean: clean
 	@echo Cleaning $(NAME)
 	@rm -rf $(NAME)
+	@make -C minilibx fclean
+	@rm -rf minilibx.so
 
-run: $(NAME)
-	./$(NAME) avm/sample.avm
-
-.PHONY: all clean fclean run re glfw
+.PHONY: all clean fclean run re glfw minilibx
 
 -include $(DEPS)

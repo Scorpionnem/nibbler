@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:05:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/16 13:06:31 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/16 14:27:23 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,12 +37,29 @@ class	GameState
 		GameState(int width, int height)
 		{
 			setWidth(width);
-			setWidth(height);
+			setHeight(height);
 			_map.reserve(_width * _height);
 			for (int i = 0; i < _width * _height; i++)
-				_map[i] = GameState::Tile::EMPTY;
+				_map.push_back(GameState::Tile::EMPTY);
+			_map[0] = GameState::Tile::FOOD;
+			_map[1] = GameState::Tile::WALL;
+			_map[2] = GameState::Tile::SNAKE_BODY;
+			_map[3] = GameState::Tile::SNAKE_HEAD;
 		}
-
+		GameState(const GameState &cpy)
+		{
+			*this = cpy;
+		}
+		GameState &operator=(const GameState &cpy)
+		{
+			if (this != &cpy)
+			{
+				_width = cpy._width;
+				_height = cpy._height;
+				_map = cpy._map;
+			}
+			return (*this);
+		}
 		int	getWidth() {return (_width);}
 		int	getHeight() {return (_height);}
 		const std::vector<GameState::Tile>	&getMap() {return (_map);}
