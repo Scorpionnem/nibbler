@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:04:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/16 13:32:59 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/16 16:11:58 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,16 @@ class	Nibbler
 
 		int	start(int ac, char **av);
 	private:
+		enum class SnakeDirection
+		{
+			UP,
+			DOWN,
+			LEFT,
+			RIGHT,
+			NONE
+		};
+		SnakeDirection	_snakeDirection = SnakeDirection::RIGHT;
+		
 		GameState	_gameState;
 		bool	_running = true;
 		void	*_graphicsDLHandle = NULL;
@@ -30,8 +40,11 @@ class	Nibbler
 
 		using GraphicsDLGetFn = GraphicsDL *(*)();
 		GraphicsDL	*_loadGraphicsDL(const char *path);
+		
+		void	updateSnake();
+
 		void	_stop();
-		int	_checkArgs(int ac, char **av);
+		int		_checkArgs(int ac, char **av);
 		void	_printUsage()
 		{
 			std::cout << "./nibbler <width: " << GameState::MIN_WIDTH << "-" << GameState::MAX_WIDTH << "> <height: " << GameState::MIN_HEIGHT << "-" << GameState::MAX_HEIGHT << ">" << std::endl;
