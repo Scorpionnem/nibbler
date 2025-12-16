@@ -5,13 +5,17 @@ INCLUDES = -I includes
 
 NAME = nibbler
 
-SRCS = src/main.cpp
+SRCS =	src/main.cpp\
+		src/Nibbler.cpp
 
 OBJDIR = obj
 OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)
 DEPS = $(SRCS:%.cpp=$(OBJDIR)/%.d)
 
-all: $(NAME)
+all:
+	@make -j compile --no-print-directory
+
+compile: $(NAME)
 
 glfw:
 	@make -C glfw/ all --no-print-directory
