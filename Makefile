@@ -12,7 +12,7 @@ OBJDIR = obj
 OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)
 DEPS = $(SRCS:%.cpp=$(OBJDIR)/%.d)
 
-all: minilibx
+all: sfml
 	@make -j compile --no-print-directory
 
 compile: $(NAME)
@@ -21,9 +21,9 @@ glfw:
 	@make -C glfw/ all --no-print-directory
 	@cp glfw/glfw.so .
 
-minilibx:
-	@make -C minilibx/ all --no-print-directory
-	@cp minilibx/minilibx.so .
+sfml:
+	@make -C sfml/ all --no-print-directory
+	@cp sfml/sfml.so .
 
 re: fclean all
 
@@ -38,15 +38,12 @@ $(OBJDIR)/%.o: %.cpp
 
 clean:
 	@echo Cleaning objects
-	@make -C minilibx clean
 	@rm -rf $(OBJDIR)
 
 fclean: clean
 	@echo Cleaning $(NAME)
 	@rm -rf $(NAME)
-	@make -C minilibx fclean
-	@rm -rf minilibx.so
 
-.PHONY: all clean fclean run re glfw minilibx
+.PHONY: all clean fclean run re glfw sfml
 
 -include $(DEPS)
