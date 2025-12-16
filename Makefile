@@ -12,7 +12,7 @@ OBJDIR = obj
 OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)
 DEPS = $(SRCS:%.cpp=$(OBJDIR)/%.d)
 
-all: sfml
+all: sdl
 	@make -j compile --no-print-directory
 
 compile: $(NAME)
@@ -21,9 +21,9 @@ glfw:
 	@make -C glfw/ all --no-print-directory
 	@cp glfw/glfw.so .
 
-sfml:
-	@make -C sfml/ all --no-print-directory
-	@cp sfml/sfml.so .
+sdl:
+	@make -C sdl/ all --no-print-directory
+	@cp sdl/sdl.so .
 
 re: fclean all
 
@@ -44,6 +44,6 @@ fclean: clean
 	@echo Cleaning $(NAME)
 	@rm -rf $(NAME)
 
-.PHONY: all clean fclean run re glfw sfml
+.PHONY: all clean fclean run re glfw sdl
 
 -include $(DEPS)

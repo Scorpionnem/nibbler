@@ -8,7 +8,7 @@ INCLUDES =	-I includes/\
 
 EXTERNALDIR = external
 
-NAME = sfml.so
+NAME = sdl.so
 
 SRCS = src/entrypoint.cpp
 
