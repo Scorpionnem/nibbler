@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:05:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 13:04:11 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 13:28:39 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,11 +66,7 @@ class	GameState
 			_map.reserve(_width * _height);
 			for (int i = 0; i < _width * _height; i++)
 				_map.push_back(GameState::Tile::EMPTY);
-			setTile(GameState::Tile::FOOD, 0, 0);
-			setTile(GameState::Tile::FOOD, 1, 1);
-			setTile(GameState::Tile::FOOD, 2, 2);
-			setTile(GameState::Tile::FOOD, 3, 3);
-			setTile(GameState::Tile::FOOD, 4, 4);
+			spawnFood();
 			_snake.push_back(Snake(SnakePart::HEAD, SnakeDirection::RIGHT, (_width / 2) + 1, _height / 2));
 			_snake.push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2), _height / 2));
 			_snake.push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2) - 1, _height / 2));
@@ -107,6 +103,27 @@ class	GameState
 				throw std::runtime_error("getTile out of bounds");
 			return (_map[y * _width + x]);
 		}
+		bool	isFree(int x, int y)
+		{
+			if (getTile(x, y) != Tile::EMPTY)
+				return (false);
+			for (Snake &part : _snake)
+				if (part.x == x && part.y == y)
+					return (false);
+			return (true);
+		}
+		void	spawnFood()
+		{
+			int	x = 0;
+			int	y = 0;
+			
+			do
+			{
+				x = rand() % _width;
+				y = rand() % _height;
+			} while (!isFree(x, y));
+			setTile(Tile::FOOD, x, y);
+		}
 		bool	advanceSnake(SnakeDirection dir)
 		{
 			if (dir != SnakeDirection::NONE)
@@ -139,6 +156,7 @@ class	GameState
 			{
 				setTile(Tile::EMPTY, headX, headY);
 				growSnake(lastTail);
+				spawnFood();
 			}
 			return (true);
 		}
