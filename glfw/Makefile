@@ -1,16 +1,16 @@
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -MMD -MP -g -fPIC
-SDLFLAGS = -lSDL2 -lGL
+GLFW_CFLAGS  = $(shell pkg-config --cflags glfw3)
+GLFW_LDFLAGS = $(shell pkg-config --libs glfw3)
 
 INCLUDES =	-I includes/\
 			-I ../includes/shared\
-			-I ./$(EXTERNALDIR)/SDL/include/
 
 EXTERNALDIR = external
 
-NAME = sdl.so
+NAME = glfw.so
 
-SRCS = src/entrypoint.cpp src/SDLDL.cpp
+SRCS = src/entrypoint.cpp src/GLFWDL.cpp
 
 OBJDIR = obj
 OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)
@@ -21,8 +21,6 @@ all:
 
 compile: $(NAME)
 
-SDL_VERSION = release-2.30.5
-
 $(EXTERNALDIR):
 	@mkdir -p $(EXTERNALDIR)
 
@@ -30,12 +28,12 @@ re: fclean all
 
 $(NAME): $(OBJS)
 	@echo Compiling $(NAME)
-	@$(CXX) $(CXXFLAGS) $(SDLFLAGS) $(INCLUDES) -o $@ $^ -shared
+	@$(CXX) $(CXXFLAGS) $(GLFW_LDFLAGS) $(INCLUDES) -o $@ $^ -shared
 
 $(OBJDIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
 	@echo Compiling $<
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(GLFW_CFLAGS) -c $< -o $@
 
 clean:
 	@echo Cleaning objects

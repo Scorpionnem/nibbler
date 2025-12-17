@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/17 10:37:51 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 10:38:59 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 14:58:27 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	SDLDL::open(GameState &gameState)
 
 	int	width = gameState.getWidth() * SQUARE_SIZE;
 	int	height = gameState.getHeight() * SQUARE_SIZE;
-	_window = SDL_CreateWindow("Nibbler", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+	_window = SDL_CreateWindow("Nibbler SDL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
 
 	if (!_window)
 		throw std::runtime_error("Error creating window");

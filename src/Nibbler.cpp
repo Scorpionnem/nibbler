@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:08:40 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 14:00:52 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 15:30:22 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ int	Nibbler::start(int ac, char **av)
 				{
 					if (_currentGDL == input)
 						break ;
+					_switchGraphicsDL("./glfw.so");
 					_currentGDL = input;
 					break ;
 				}

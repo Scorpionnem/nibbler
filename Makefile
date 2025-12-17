@@ -12,7 +12,7 @@ OBJDIR = obj
 OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)
 DEPS = $(SRCS:%.cpp=$(OBJDIR)/%.d)
 
-all: sdl
+all: sdl glfw
 	@make -j compile --no-print-directory
 
 compile: $(NAME)
@@ -38,10 +38,14 @@ $(OBJDIR)/%.o: %.cpp
 
 clean:
 	@echo Cleaning objects
+	@make -C glfw clean
+	@make -C sdl clean
 	@rm -rf $(OBJDIR)
 
 fclean: clean
 	@echo Cleaning $(NAME)
+	@make -C glfw fclean
+	@make -C sdl fclean
 	@rm -rf $(NAME)
 
 .PHONY: all clean fclean run re glfw sdl
