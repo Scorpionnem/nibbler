@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:08:40 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/16 16:12:06 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 09:48:54 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ int	Nibbler::start(int ac, char **av)
 	_graphicsDL->open(_gameState);
 	while (_running)
 	{
+		_snakeDirection = GameState::SnakeDirection::NONE;
+
 		GraphicsDL::Input	input;
 		do
 		{
@@ -33,16 +35,16 @@ int	Nibbler::start(int ac, char **av)
 					_running = false;
 					break ;
 				case GraphicsDL::Input::RIGHT:
-					_snakeDirection = SnakeDirection::RIGHT;
+					_snakeDirection = GameState::SnakeDirection::RIGHT;
 					break ;
 				case GraphicsDL::Input::LEFT:
-					_snakeDirection = SnakeDirection::LEFT;
+					_snakeDirection = GameState::SnakeDirection::LEFT;
 					break ;
 				case GraphicsDL::Input::UP:
-					_snakeDirection = SnakeDirection::UP;
+					_snakeDirection = GameState::SnakeDirection::UP;
 					break ;
 				case GraphicsDL::Input::DOWN:
-					_snakeDirection = SnakeDirection::DOWN;
+					_snakeDirection = GameState::SnakeDirection::DOWN;
 					break ;
 				default:
 					break ;
@@ -57,7 +59,13 @@ int	Nibbler::start(int ac, char **av)
 
 void	Nibbler::updateSnake()
 {
-	
+	if (_snakeDirection == GameState::SnakeDirection::NONE)
+		return ;
+	if (!_gameState.advanceSnake(_snakeDirection))
+	{
+		std::cout << "You died." << std::endl;
+		_running = false;
+	}
 }
 
 void	Nibbler::_stop()

@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:05:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/16 14:27:23 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 09:50:43 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,38 @@ class	GameState
 			EMPTY,
 			WALL,
 			FOOD,
-			SNAKE_BODY,
-			SNAKE_HEAD,
 		};
-		static constexpr	int	MAX_WIDTH = 50;
+		enum class	SnakePart
+		{
+			BODY,
+			HEAD
+		};
+		enum class SnakeDirection
+		{
+			UP,
+			DOWN,
+			LEFT,
+			RIGHT,
+			NONE
+		};
+		struct	Snake
+		{
+			Snake(SnakePart part, SnakeDirection dir, int x, int y)
+			{
+				this->part = part;
+				this->dir = dir;
+				this->x = x;
+				this->y = y;
+			}
+			SnakePart		part;
+			SnakeDirection	dir;
+			int				x;
+			int				y;
+		};
+		static constexpr	int	MAX_WIDTH = 30;
 		static constexpr	int	MIN_WIDTH = 10;
 
-		static constexpr	int	MAX_HEIGHT = 50;
+		static constexpr	int	MAX_HEIGHT = 30;
 		static constexpr	int	MIN_HEIGHT = 10;
 	public:
 		GameState() {}
@@ -41,10 +66,15 @@ class	GameState
 			_map.reserve(_width * _height);
 			for (int i = 0; i < _width * _height; i++)
 				_map.push_back(GameState::Tile::EMPTY);
-			_map[0] = GameState::Tile::FOOD;
-			_map[1] = GameState::Tile::WALL;
-			_map[2] = GameState::Tile::SNAKE_BODY;
-			_map[3] = GameState::Tile::SNAKE_HEAD;
+			setTile(GameState::Tile::FOOD, 0, 0);
+			setTile(GameState::Tile::FOOD, 1, 1);
+			setTile(GameState::Tile::FOOD, 2, 2);
+			setTile(GameState::Tile::FOOD, 3, 3);
+			setTile(GameState::Tile::FOOD, 4, 4);
+			_snake.push_back(Snake(SnakePart::HEAD, SnakeDirection::RIGHT, (_width / 2) + 1, _height / 2));
+			_snake.push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2), _height / 2));
+			_snake.push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2) - 1, _height / 2));
+			_snake.push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2) - 2, _height / 2));
 		}
 		GameState(const GameState &cpy)
 		{
@@ -57,13 +87,85 @@ class	GameState
 				_width = cpy._width;
 				_height = cpy._height;
 				_map = cpy._map;
+				_snake = cpy._snake;
 			}
 			return (*this);
 		}
 		int	getWidth() {return (_width);}
 		int	getHeight() {return (_height);}
 		const std::vector<GameState::Tile>	&getMap() {return (_map);}
+		const std::vector<GameState::Snake>	&getSnake() {return (_snake);}
+		void	setTile(GameState::Tile tile, int x, int y)
+		{
+			if (x >= _width || x < 0 || y >= _height || y < 0)
+				throw std::runtime_error("setTile out of bounds");
+			_map[y * _width + x] = tile;
+		}
+		GameState::Tile	getTile(int x, int y)
+		{
+			if (x >= _width || x < 0 || y >= _height || y < 0)
+				throw std::runtime_error("getTile out of bounds");
+			return (_map[y * _width + x]);
+		}
+		bool	advanceSnake(SnakeDirection dir)
+		{
+			_snake.front().dir = dir;
+			SnakeDirection	prevDir = dir;
+			for (Snake &part : _snake)
+				prevDir = _advanceSnakePart(part, prevDir);
+			if (_checkDeath())
+				return (false);
+			int	headX = _snake.front().x;
+			int	headY = _snake.front().y;
+			if (getTile(headX, headY) == Tile::FOOD)
+			{
+				setTile(Tile::EMPTY, headX, headY);
+				growSnake();
+			}
+			return (true);
+		}
+		void	growSnake()
+		{
+			Snake	tail = _snake.back();
+			int	x = tail.x;
+			int	y = tail.y;
+
+			if (tail.dir == SnakeDirection::UP)
+				y += 1;
+			if (tail.dir == SnakeDirection::DOWN)
+				y -= 1;
+			if (tail.dir == SnakeDirection::LEFT)
+				x += 1;
+			if (tail.dir == SnakeDirection::RIGHT)
+				x -= 1;
+			_snake.push_back(Snake(SnakePart::BODY, tail.dir, x, y));
+		}
 	private:
+		bool	_checkDeath()
+		{
+			int	headX = _snake.front().x;
+			int	headY = _snake.front().y;
+			for (Snake &part : _snake)
+			{
+				if (part.part != SnakePart::HEAD && part.x == headX && part.y == headY)
+					return (true);
+			}
+			return (false);
+		}
+		SnakeDirection	_advanceSnakePart(Snake &part, SnakeDirection nextDir)
+		{
+			if (part.dir == SnakeDirection::UP)
+				part.y -= 1;
+			if (part.dir == SnakeDirection::DOWN)
+				part.y += 1;
+			if (part.dir == SnakeDirection::LEFT)
+				part.x -= 1;
+			if (part.dir == SnakeDirection::RIGHT)
+				part.x += 1;
+			SnakeDirection	tmp = part.dir;
+			part.dir = nextDir;
+			return (tmp);
+		}
 		void	setWidth(int w)
 		{
 			if (w < MIN_WIDTH || w > MAX_WIDTH)
@@ -77,6 +179,7 @@ class	GameState
 			_height = h;
 		}
 		std::vector<GameState::Tile>	_map;
+		std::vector<Snake>				_snake;
 		int								_width = 0;
 		int								_height = 0;
 };

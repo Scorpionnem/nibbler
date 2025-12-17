@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:15:23 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/16 16:02:12 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 09:26:00 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,22 +70,16 @@ class	TemplateDL : public GraphicsDL
 						SDL_RenderFillRect(_renderer, &rec);
 						break ;
 					}
-					case GameState::Tile::SNAKE_HEAD:
-					{
-						SDL_Rect	rec = {x * 32, y * 32, 32, 32};
-						SDL_SetRenderDrawColor(_renderer, 0, 255, 0, 255);
-						SDL_RenderFillRect(_renderer, &rec);
-						break ;
-					}
-					case GameState::Tile::SNAKE_BODY:
-					{
-						SDL_Rect	rec = {x * 32, y * 32, 32, 32};
-						SDL_SetRenderDrawColor(_renderer, 0, 127, 0, 255);
-						SDL_RenderFillRect(_renderer, &rec);
-						break ;
-					}
 					default:
+					{
+						if ((x + y) % 2)
+						{
+							SDL_Rect	rec = {x * 32, y * 32, 32, 32};
+							SDL_SetRenderDrawColor(_renderer, 6, 6, 6, 255);
+							SDL_RenderFillRect(_renderer, &rec);
+						}
 						break ;
+					}
 				}
 				x++;
 				if (x >= gameState.getWidth())
@@ -93,6 +87,12 @@ class	TemplateDL : public GraphicsDL
 					x = 0;
 					y++;
 				}
+			}
+			for (GameState::Snake snake : gameState.getSnake())
+			{
+				SDL_Rect	rec = {snake.x * 32, snake.y * 32, 32, 32};
+				SDL_SetRenderDrawColor(_renderer, 0, 255 - (snake.part == GameState::SnakePart::HEAD) * 100, 0, 255);
+				SDL_RenderFillRect(_renderer, &rec);
 			}
 			SDL_RenderPresent(_renderer);
 		}

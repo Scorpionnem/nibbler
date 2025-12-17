@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:04:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/16 16:11:58 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 09:10:53 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,16 +23,8 @@ class	Nibbler
 
 		int	start(int ac, char **av);
 	private:
-		enum class SnakeDirection
-		{
-			UP,
-			DOWN,
-			LEFT,
-			RIGHT,
-			NONE
-		};
-		SnakeDirection	_snakeDirection = SnakeDirection::RIGHT;
-		
+		GameState::SnakeDirection	_snakeDirection = GameState::SnakeDirection::RIGHT;
+
 		GameState	_gameState;
 		bool	_running = true;
 		void	*_graphicsDLHandle = NULL;
