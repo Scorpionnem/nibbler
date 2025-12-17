@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:08:40 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 12:52:52 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 13:54:36 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,10 +171,24 @@ int	Nibbler::_checkArgs(int ac, char **av)
 				if (*(av + 1))
 				{
 					_updateDelay = std::stod(*(av + 1));
+					if (_updateDelay <= 0)
+						throw std::runtime_error("delay: too low!");
 					av++;
 				}
 				else
 					throw std::runtime_error("delay: invalid arguments!");
+			}
+			else if (std::string(*av) == "start_food")
+			{
+				if (*(av + 1))
+				{
+					_startFood = std::stoi(*(av + 1));
+					if (_startFood <= 0)
+						throw std::runtime_error("start_food: invalid arguments!");
+					av++;
+				}
+				else
+					throw std::runtime_error("start_food: invalid arguments!");
 			}
 			else
 				throw std::runtime_error("unknown option!");
@@ -182,8 +196,12 @@ int	Nibbler::_checkArgs(int ac, char **av)
 		}
 	} catch (const std::exception &e) {
 		std::cerr << "Nibbler: Error: " << e.what() << std::endl;
+		_printUsage();
 		return (0);
 	}
+
+	while (_startFood--)
+		_gameState.spawnFood();
 
 	return (1);
 }

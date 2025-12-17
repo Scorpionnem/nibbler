@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:04:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 12:40:16 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 13:54:23 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ class	Nibbler
 		GameState::SnakeDirection	_snakeDirection = GameState::SnakeDirection::RIGHT;
 
 		double	_updateDelay = 0.2;
+		int		_startFood = 1;
 
 		GameState	_gameState;
 		bool	_running = true;
@@ -45,7 +46,7 @@ class	Nibbler
 		int		_checkArgs(int ac, char **av);
 		void	_printUsage()
 		{
-			std::cout << "./nibbler <width: " << GameState::MIN_WIDTH << "-" << GameState::MAX_WIDTH << "> <height: " << GameState::MIN_HEIGHT << "-" << GameState::MAX_HEIGHT << ">" << std::endl;
+			std::cout << "./nibbler <width: " << GameState::MIN_WIDTH << "-" << GameState::MAX_WIDTH << "> <height: " << GameState::MIN_HEIGHT << "-" << GameState::MAX_HEIGHT << ">" << " <delay|start_food>" << std::endl;
 		}
 };
 

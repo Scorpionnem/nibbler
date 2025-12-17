@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:05:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 13:28:39 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 13:52:09 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ class	GameState
 			_map.reserve(_width * _height);
 			for (int i = 0; i < _width * _height; i++)
 				_map.push_back(GameState::Tile::EMPTY);
-			spawnFood();
 			_snake.push_back(Snake(SnakePart::HEAD, SnakeDirection::RIGHT, (_width / 2) + 1, _height / 2));
 			_snake.push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2), _height / 2));
 			_snake.push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2) - 1, _height / 2));
@@ -117,6 +116,12 @@ class	GameState
 			int	x = 0;
 			int	y = 0;
 			
+			int	freeTiles = 0;
+			for (int xx = 0; xx < _width; xx++)
+				for (int yy = 0; yy < _width; yy++)
+					freeTiles += isFree(xx, yy);
+			if (freeTiles <= 0)
+				return ;
 			do
 			{
 				x = rand() % _width;
