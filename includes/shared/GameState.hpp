@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:05:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 09:50:43 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 11:14:56 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,9 @@ class	GameState
 		{
 			_snake.front().dir = dir;
 			SnakeDirection	prevDir = dir;
+			int				lastTailX = _snake.back().x;
+			int				lastTailY = _snake.back().y;
+			SnakeDirection	lastTailDir = _snake.back().dir;
 			for (Snake &part : _snake)
 				prevDir = _advanceSnakePart(part, prevDir);
 			if (_checkDeath())
@@ -120,25 +123,13 @@ class	GameState
 			if (getTile(headX, headY) == Tile::FOOD)
 			{
 				setTile(Tile::EMPTY, headX, headY);
-				growSnake();
+				growSnake(lastTailDir, lastTailX, lastTailY);
 			}
 			return (true);
 		}
-		void	growSnake()
+		void	growSnake(SnakeDirection lastTailDir, int lastTailX, int lastTailY)
 		{
-			Snake	tail = _snake.back();
-			int	x = tail.x;
-			int	y = tail.y;
-
-			if (tail.dir == SnakeDirection::UP)
-				y += 1;
-			if (tail.dir == SnakeDirection::DOWN)
-				y -= 1;
-			if (tail.dir == SnakeDirection::LEFT)
-				x += 1;
-			if (tail.dir == SnakeDirection::RIGHT)
-				x -= 1;
-			_snake.push_back(Snake(SnakePart::BODY, tail.dir, x, y));
+			_snake.push_back(Snake(SnakePart::BODY, lastTailDir, lastTailX, lastTailY));
 		}
 	private:
 		bool	_checkDeath()
