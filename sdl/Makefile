@@ -32,7 +32,7 @@ sdl:
 		git clone https://github.com/libsdl-org/SDL.git $(EXTERNALDIR)/SDL && \
 		cd $(EXTERNALDIR)/SDL && \
 		git checkout $(SDL_VERSION) && \
-		echo "\033[34;1mCompiling SDL\033[0m"; \
+		echo "\033[34;1mCompiling SDL\033[0m" && \
 		mkdir build && cd build && \
 		cmake .. -DCMAKE_BUILD_TYPE=Release -DSDL_STATIC=OFF -DSDL_SHARED=ON && \
 		cmake --build . --config Release; \
