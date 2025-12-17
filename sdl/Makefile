@@ -10,7 +10,7 @@ EXTERNALDIR = external
 
 NAME = sdl.so
 
-SRCS = src/entrypoint.cpp
+SRCS = src/entrypoint.cpp src/SDLDL.cpp
 
 OBJDIR = obj
 OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)
