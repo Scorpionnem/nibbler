@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:05:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 11:14:56 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 11:16:58 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,26 +110,29 @@ class	GameState
 		bool	advanceSnake(SnakeDirection dir)
 		{
 			_snake.front().dir = dir;
+			
 			SnakeDirection	prevDir = dir;
-			int				lastTailX = _snake.back().x;
-			int				lastTailY = _snake.back().y;
-			SnakeDirection	lastTailDir = _snake.back().dir;
+			Snake	lastTail = _snake.back();
+			
 			for (Snake &part : _snake)
 				prevDir = _advanceSnakePart(part, prevDir);
+
 			if (_checkDeath())
 				return (false);
+
 			int	headX = _snake.front().x;
 			int	headY = _snake.front().y;
+
 			if (getTile(headX, headY) == Tile::FOOD)
 			{
 				setTile(Tile::EMPTY, headX, headY);
-				growSnake(lastTailDir, lastTailX, lastTailY);
+				growSnake(lastTail);
 			}
 			return (true);
 		}
-		void	growSnake(SnakeDirection lastTailDir, int lastTailX, int lastTailY)
+		void	growSnake(Snake lastTail)
 		{
-			_snake.push_back(Snake(SnakePart::BODY, lastTailDir, lastTailX, lastTailY));
+			_snake.push_back(Snake(SnakePart::BODY, lastTail.dir, lastTail.x, lastTail.y));
 		}
 	private:
 		bool	_checkDeath()
