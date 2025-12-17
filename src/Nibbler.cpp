@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:08:40 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 13:54:36 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 14:00:52 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,7 +201,7 @@ int	Nibbler::_checkArgs(int ac, char **av)
 	}
 
 	while (_startFood--)
-		_gameState.spawnFood();
+		_gameState.spawnRandom(GameState::Tile::FOOD);
 
 	return (1);
 }

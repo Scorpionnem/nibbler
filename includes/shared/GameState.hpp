@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:05:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 13:52:09 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 14:02:03 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ class	GameState
 					return (false);
 			return (true);
 		}
-		void	spawnFood()
+		void	spawnRandom(GameState::Tile tile)
 		{
 			int	x = 0;
 			int	y = 0;
@@ -127,7 +127,7 @@ class	GameState
 				x = rand() % _width;
 				y = rand() % _height;
 			} while (!isFree(x, y));
-			setTile(Tile::FOOD, x, y);
+			setTile(tile, x, y);
 		}
 		bool	advanceSnake(SnakeDirection dir)
 		{
@@ -161,7 +161,7 @@ class	GameState
 			{
 				setTile(Tile::EMPTY, headX, headY);
 				growSnake(lastTail);
-				spawnFood();
+				spawnRandom(Tile::FOOD);
 			}
 			return (true);
 		}
@@ -179,6 +179,8 @@ class	GameState
 				if (part.part != SnakePart::HEAD && part.x == headX && part.y == headY)
 					return (true);
 			}
+			if (getTile(headX, headY) != Tile::FOOD && getTile(headX, headY) != Tile::EMPTY)
+				return (true);
 			return (false);
 		}
 		SnakeDirection	_advanceSnakePart(Snake &part, SnakeDirection nextDir)
