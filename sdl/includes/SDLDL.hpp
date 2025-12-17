@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/17 10:36:54 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 10:38:49 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 14:41:18 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 # include <thread>
 # include <atomic>
 # include <unistd.h>
-# include "SDL.h"
+# include "SDL2/SDL.h"
 
 # define SQUARE_SIZE 32
 
