@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:04:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 10:00:38 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 12:40:16 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define NIBBLER_HPP
 
 # include "GraphicsDL.hpp"
+# include <ctime>
 
 class	Nibbler
 {
@@ -23,8 +24,11 @@ class	Nibbler
 
 		int	start(int ac, char **av);
 	private:
+		struct timespec				_lastFrame = {0, 0};
 		GraphicsDL::Input			_currentGDL;
 		GameState::SnakeDirection	_snakeDirection = GameState::SnakeDirection::RIGHT;
+
+		double	_updateDelay = 0.2;
 
 		GameState	_gameState;
 		bool	_running = true;
@@ -35,7 +39,7 @@ class	Nibbler
 		GraphicsDL	*_loadGraphicsDL(const char *path);
 		void	_switchGraphicsDL(const char *path);
 		
-		void	updateSnake();
+		void	updateSnake(double deltaTime);
 
 		void	_stop();
 		int		_checkArgs(int ac, char **av);

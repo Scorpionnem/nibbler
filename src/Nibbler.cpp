@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:08:40 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 10:02:26 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 12:52:52 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,15 @@ int	Nibbler::start(int ac, char **av)
 		return (1);
 	_switchGraphicsDL("./sdl.so");
 	_currentGDL = GraphicsDL::Input::SWITCH1;
+	clock_gettime(CLOCK_MONOTONIC, &_lastFrame);
 	while (_running)
 	{
-		_snakeDirection = GameState::SnakeDirection::NONE;
+		struct timespec	currentFrame;
+		double			deltaTime;
+
+		clock_gettime(CLOCK_MONOTONIC, &currentFrame);
+		deltaTime = (currentFrame.tv_sec - _lastFrame.tv_sec) + (currentFrame.tv_nsec - _lastFrame.tv_nsec) * 1e-9;
+		_lastFrame = currentFrame;
 
 		GraphicsDL::Input	input;
 		do
@@ -70,17 +76,21 @@ int	Nibbler::start(int ac, char **av)
 					break ;
 			}
 		} while (input != GraphicsDL::Input::NONE);
-		updateSnake();
+		updateSnake(deltaTime);
 		_graphicsDL->render(_gameState);
 	}
 	_stop();
 	return (0);
 }
 
-void	Nibbler::updateSnake()
+void	Nibbler::updateSnake(double deltaTime)
 {
-	if (_snakeDirection == GameState::SnakeDirection::NONE)
+	static double lastUpdate = 0;
+
+	lastUpdate += deltaTime;
+	if (lastUpdate < _updateDelay)
 		return ;
+	lastUpdate = 0;
 	if (!_gameState.advanceSnake(_snakeDirection))
 	{
 		std::cout << "You died." << std::endl;
@@ -149,6 +159,29 @@ int	Nibbler::_checkArgs(int ac, char **av)
 	} catch (const std::exception &e) {
 		std::cerr << "Invalid width or height" << std::endl;
 		_printUsage();
+		return (0);
+	}
+	av += 3;
+
+	try {
+		while (*av)
+		{
+			if (std::string(*av) == "delay")
+			{
+				if (*(av + 1))
+				{
+					_updateDelay = std::stod(*(av + 1));
+					av++;
+				}
+				else
+					throw std::runtime_error("delay: invalid arguments!");
+			}
+			else
+				throw std::runtime_error("unknown option!");
+			av++;
+		}
+	} catch (const std::exception &e) {
+		std::cerr << "Nibbler: Error: " << e.what() << std::endl;
 		return (0);
 	}
 

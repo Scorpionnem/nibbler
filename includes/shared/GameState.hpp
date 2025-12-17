@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:05:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 11:16:58 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 12:33:03 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,9 +109,10 @@ class	GameState
 		}
 		bool	advanceSnake(SnakeDirection dir)
 		{
-			_snake.front().dir = dir;
+			if (dir != SnakeDirection::NONE)
+				_snake.front().dir = dir;
 			
-			SnakeDirection	prevDir = dir;
+			SnakeDirection	prevDir = _snake.front().dir;
 			Snake	lastTail = _snake.back();
 			
 			for (Snake &part : _snake)
