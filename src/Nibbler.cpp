@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:08:40 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 09:48:54 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 10:02:26 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,8 @@ int	Nibbler::start(int ac, char **av)
 {
 	if (!_checkArgs(ac, av))
 		return (1);
-	_graphicsDL = _loadGraphicsDL("./sdl.so");
-	if (!_graphicsDL)
-		return (1);
-	_graphicsDL->open(_gameState);
+	_switchGraphicsDL("./sdl.so");
+	_currentGDL = GraphicsDL::Input::SWITCH1;
 	while (_running)
 	{
 		_snakeDirection = GameState::SnakeDirection::NONE;
@@ -46,6 +44,28 @@ int	Nibbler::start(int ac, char **av)
 				case GraphicsDL::Input::DOWN:
 					_snakeDirection = GameState::SnakeDirection::DOWN;
 					break ;
+				case GraphicsDL::Input::SWITCH1:
+				{
+					if (_currentGDL == input)
+						break ;
+					_switchGraphicsDL("./sdl.so");
+					_currentGDL = input;
+					break ;
+				}
+				case GraphicsDL::Input::SWITCH2:
+				{
+					if (_currentGDL == input)
+						break ;
+					_currentGDL = input;
+					break ;
+				}
+				case GraphicsDL::Input::SWITCH3:
+				{
+					if (_currentGDL == input)
+						break ;
+					_currentGDL = input;
+					break ;
+				}
 				default:
 					break ;
 			}
@@ -74,6 +94,14 @@ void	Nibbler::_stop()
 		delete _graphicsDL;
 	if (_graphicsDLHandle)
 		dlclose(_graphicsDLHandle);
+}
+
+void	Nibbler::_switchGraphicsDL(const char *path)
+{
+	_graphicsDL = _loadGraphicsDL(path);
+	if (!_graphicsDL)
+		return ;
+	_graphicsDL->open(_gameState);
 }
 
 GraphicsDL	*Nibbler::_loadGraphicsDL(const char *path)

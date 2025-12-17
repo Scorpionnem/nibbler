@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:07:21 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/16 13:47:38 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 09:58:37 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,9 @@ class	GraphicsDL
 			RIGHT,
 			
 			CLOSE,
-			SWITCH,
+			SWITCH1,
+			SWITCH2,
+			SWITCH3,
 			
 			NONE,
 		};

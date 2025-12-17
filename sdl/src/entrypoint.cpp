@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:15:23 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 09:26:00 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/17 09:58:58 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,12 @@ class	TemplateDL : public GraphicsDL
 								return (GraphicsDL::Input::DOWN);
 							case SDLK_d:
 								return (GraphicsDL::Input::RIGHT);
+							case SDLK_1:
+								return (GraphicsDL::Input::SWITCH1);
+							case SDLK_2:
+								return (GraphicsDL::Input::SWITCH2);
+							case SDLK_3:
+								return (GraphicsDL::Input::SWITCH3);
 							case SDLK_ESCAPE:
 								return (GraphicsDL::Input::CLOSE);
 						}
