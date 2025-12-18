@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:04:26 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 15:30:44 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 15:46:04 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,13 @@ void	Nibbler::_thread()
 			clientToPlayer[client.fd()] = 1;
 		else
 			clientToPlayer[client.fd()] = -1;
+	});
+	_server.setDisconnectCallback([this](const Server::Client &client)
+	{
+		int	player = clientToPlayer[client.fd()];
+		if (player == -1)
+			return ;
+		_running = false;
 	});
 	_server_opened = true;
 	while (_running)
