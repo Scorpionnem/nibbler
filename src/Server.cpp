@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/16 14:41:22 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/03 00:15:21 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 11:32:58 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	Server::_processInput(Server::Client &client, const std::string &msg)
 void	Server::update()
 {
 	_refreshPoll();
-	int	pollEvents = poll(_fds, _clients.size() + 1, -1);
+	int	pollEvents = poll(_fds, _clients.size() + 1, 1);
 	if (pollEvents == -1 && errno == EINTR)
 		return ;
 

@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:04:57 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 10:56:49 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 11:40:31 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,13 @@ void	Nibbler::_runGame()
 {
 	while (_running)
 	{
+		try {
+			_serverClient.update();
+		} catch (const std::exception &e) {
+			_running = false;
+			break ;
+		}
+		
 		struct timespec	currentFrame;
 		double			deltaTime;
 
@@ -33,15 +40,19 @@ void	Nibbler::_runGame()
 					_running = false;
 					break ;
 				case GraphicsDL::Input::RIGHT:
+					_serverClient.send("RIGHT");
 					_snakeDirection = GameState::SnakeDirection::RIGHT;
 					break ;
 				case GraphicsDL::Input::LEFT:
+					_serverClient.send("LEFT");
 					_snakeDirection = GameState::SnakeDirection::LEFT;
 					break ;
 				case GraphicsDL::Input::UP:
+					_serverClient.send("UP");
 					_snakeDirection = GameState::SnakeDirection::UP;
 					break ;
 				case GraphicsDL::Input::DOWN:
+					_serverClient.send("DOWN");
 					_snakeDirection = GameState::SnakeDirection::DOWN;
 					break ;
 				case GraphicsDL::Input::SWITCH1:
@@ -71,12 +82,6 @@ void	Nibbler::_runGame()
 					break ;
 			}
 		} while (input != GraphicsDL::Input::NONE);
-		try {
-			_serverClient.update();
-		} catch (const std::exception &e) {
-			_running = false;
-			break ;
-		}
 		updateSnake(deltaTime);
 		_graphicsDL->render(_gameState);
 	}

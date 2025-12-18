@@ -10,7 +10,8 @@ SRCS =	src/main.cpp\
 		src/Nibbler/game.cpp\
 		src/Nibbler/parsing.cpp\
 		src/Nibbler/main.cpp\
-		src/Client.cpp
+		src/Client.cpp\
+		src/Server.cpp
 
 OBJDIR = obj
 OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)

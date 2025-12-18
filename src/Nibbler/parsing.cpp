@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:03:02 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 10:47:34 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 11:42:31 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,10 @@ int	Nibbler::_checkArgs(int ac, char **av)
 				else
 					throw std::runtime_error("start_food: invalid arguments!");
 			}
+			else if (std::string(*av) == "join")
+			{
+				_hostServer = false;
+			}
 			else
 				throw std::runtime_error("unknown option!");
 			av++;
@@ -70,11 +74,29 @@ int	Nibbler::_checkArgs(int ac, char **av)
 	while (_startFood--)
 		_gameState.spawnRandom(GameState::Tile::FOOD);
 
+	if (_hostServer)
+	{
+		try {
+			_serverThread = std::thread(&Nibbler::_thread, this);
+		} catch (const std::exception &e) {
+			std::cerr << "Server: " << e.what() << std::endl;
+			return (0);
+		}
+	
+		while (!_server_opened)
+			;
+	}
+
 	try
 	{
-		_serverClient.init("localhost", 6942);
+		_serverClient.init("localhost", SERVER_PORT);
 	} catch (const std::exception &e) {
-		std::cerr << "Server: " << e.what() << std::endl;
+		std::cerr << "ServerClient: " << e.what() << std::endl;
+		if (_hostServer)
+		{
+			_running = false;
+			_serverThread.join();
+		}
 		return (0);
 	}
 

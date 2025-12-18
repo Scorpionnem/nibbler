@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:04:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 10:43:23 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 11:42:25 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,26 @@
 
 # include "GraphicsDL.hpp"
 # include <ctime>
+# include <thread>
+# include <atomic>
 # include "Client.hpp"
+# include "Server.hpp"
+
+# define SERVER_PORT 7003
 
 class	Nibbler
 {
 	public:
-		Nibbler() {}
+		Nibbler()
+		{
+			_running = true;
+			_server_opened = false;
+		}
 		~Nibbler() {}
 
 		int	start(int ac, char **av);
 	private:
+		void	_thread();
 		void	_runGame();
 		bool	_checkDeath()
 		{
@@ -104,12 +114,16 @@ class	Nibbler
 		double	_updateDelay = 0.2;
 		int		_startFood = 1;
 
-		GameState	_gameState;
-		bool	_running = true;
-		void	*_graphicsDLHandle = NULL;
-		GraphicsDL	*_graphicsDL = NULL;
+		GameState			_gameState;
+		std::atomic_bool	_running;
+		std::atomic_bool	_server_opened;
+		void				*_graphicsDLHandle = NULL;
+		GraphicsDL			*_graphicsDL = NULL;
 
-		Client	_serverClient;
+		Client		_serverClient;
+		Server		_server;
+		std::thread	_serverThread;
+		bool		_hostServer = true;
 
 		using GraphicsDLGetFn = GraphicsDL *(*)();
 		GraphicsDL	*_loadGraphicsDL(const char *path);
