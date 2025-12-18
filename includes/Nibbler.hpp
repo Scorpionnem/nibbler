@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:04:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 10:10:07 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 10:43:23 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "GraphicsDL.hpp"
 # include <ctime>
+# include "Client.hpp"
 
 class	Nibbler
 {
@@ -107,6 +108,8 @@ class	Nibbler
 		bool	_running = true;
 		void	*_graphicsDLHandle = NULL;
 		GraphicsDL	*_graphicsDL = NULL;
+
+		Client	_serverClient;
 
 		using GraphicsDLGetFn = GraphicsDL *(*)();
 		GraphicsDL	*_loadGraphicsDL(const char *path);

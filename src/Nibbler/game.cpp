@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:04:57 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 10:10:39 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 10:56:49 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,12 @@ void	Nibbler::_runGame()
 					break ;
 			}
 		} while (input != GraphicsDL::Input::NONE);
+		try {
+			_serverClient.update();
+		} catch (const std::exception &e) {
+			_running = false;
+			break ;
+		}
 		updateSnake(deltaTime);
 		_graphicsDL->render(_gameState);
 	}

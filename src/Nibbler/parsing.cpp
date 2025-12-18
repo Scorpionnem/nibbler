@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:03:02 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 10:03:16 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 10:47:34 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,14 @@ int	Nibbler::_checkArgs(int ac, char **av)
 
 	while (_startFood--)
 		_gameState.spawnRandom(GameState::Tile::FOOD);
+
+	try
+	{
+		_serverClient.init("localhost", 6942);
+	} catch (const std::exception &e) {
+		std::cerr << "Server: " << e.what() << std::endl;
+		return (0);
+	}
 
 	return (1);
 }
