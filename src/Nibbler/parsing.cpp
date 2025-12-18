@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:03:02 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 13:11:01 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 16:01:09 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ int	Nibbler::_checkArgs(int ac, char **av)
 			}
 			else if (std::string(*av) == "host")
 			{
+				_multiplayer = true;
 				if (*(av + 1))
 				{
 					_serverPort = std::stoi(*(av + 1));
@@ -93,6 +94,14 @@ int	Nibbler::_checkArgs(int ac, char **av)
 
 	while (_startFood--)
 		_gameState.spawnRandom(GameState::Tile::FOOD);
+
+	if (_multiplayer)
+	{
+		_gameState.spawnSnake(0, _gameState.getHeight() / 2 + 1);
+		_gameState.spawnSnake(1, _gameState.getHeight() / 2 - 1);
+	}
+	else
+		_gameState.spawnSnake(0, _gameState.getHeight() / 2);
 
 	if (_hostServer)
 	{

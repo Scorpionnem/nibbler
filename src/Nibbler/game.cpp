@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:04:57 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 15:30:47 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 16:03:24 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,8 @@ void	Nibbler::updateSnake(double deltaTime)
 	lastUpdate = 0;
 	if (!advanceSnake(0, _snakeDirection[0]))
 		_running = false;
-	if (!advanceSnake(1, _snakeDirection[1]))
-		_running = false;
+	if (_multiplayer)
+		if (!advanceSnake(1, _snakeDirection[1]))
+			_running = false;
 	_server.sendAll(_gameState.toString());
 }

@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:04:26 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 15:46:04 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 15:59:32 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void	Nibbler::_thread()
 		_lastFrame = currentFrame;
 		
 		_server.update();
-		if (clientToPlayer.size() < 2)
+		if (_multiplayer && clientToPlayer.size() < 2)
 			continue ;
 		updateSnake(deltaTime);
 	}

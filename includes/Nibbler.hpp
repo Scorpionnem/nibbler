@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:04:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 13:09:05 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 15:59:17 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,7 @@ class	Nibbler
 		Server		_server;
 		std::thread	_serverThread;
 		bool		_hostServer = true;
+		bool		_multiplayer = false;
 		std::map<int, int>	clientToPlayer;
 		GameState::SnakeDirection	_snakeDirection[2] = {GameState::SnakeDirection::RIGHT, GameState::SnakeDirection::RIGHT};
 

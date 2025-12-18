@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:05:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 15:23:17 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 15:59:57 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,8 +77,6 @@ class	GameState
 			_map.reserve(_width * _height);
 			for (int i = 0; i < _width * _height; i++)
 				_map.push_back(GameState::Tile::EMPTY);
-			spawnSnake(0, _height / 2 + 1);
-			spawnSnake(1, _height / 2 - 1);
 		}
 		void	spawnSnake(int player, int y)
 		{
