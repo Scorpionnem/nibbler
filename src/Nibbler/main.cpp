@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:04:26 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 13:07:43 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 14:12:26 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,6 @@ void	Nibbler::_thread()
 	_server.open(_serverPort);
 	_server.setMessageCallback([this](const Server::Client &client, const std::string &str)
 	{
-		(void)this;(void)client;
-		std::cout << "Received: " << str << std::endl;
 		int	player = clientToPlayer[client.fd()];
 		if (player == -1)
 			return ;
@@ -47,14 +45,12 @@ void	Nibbler::_thread()
 	});
 	_server.setConnectCallback([this](const Server::Client &client)
 	{
-		(void)this;
 		if (clientToPlayer.size() == 0)
 			clientToPlayer[client.fd()] = 0;
 		else if (clientToPlayer.size() == 1)
 			clientToPlayer[client.fd()] = 1;
 		else
 			clientToPlayer[client.fd()] = -1;
-		std::cout << "Received: " << client.fd() << std::endl;
 	});
 	_server_opened = true;
 	while (_running)
@@ -67,6 +63,8 @@ void	Nibbler::_thread()
 		_lastFrame = currentFrame;
 		
 		_server.update();
+		if (clientToPlayer.size() < 2)
+			continue ;
 		updateSnake(deltaTime);
 	}
 	_server.close();
