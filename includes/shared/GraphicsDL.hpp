@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:07:21 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 09:58:37 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 15:15:27 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ class	GraphicsDL
 		virtual ~GraphicsDL() {}
 
 		virtual void				open(GameState &gameState) = 0;
-		virtual void				render(GameState &gameState) = 0;
+		virtual void				render(int width, int height, const std::string &map) = 0;
 		/*
 			Should return the last input, call it until it returns Input::NONE
 		*/

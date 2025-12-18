@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:42:20 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 10:49:17 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 15:14:01 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ class	Client
 		void	init(const char *ip, int port);
 		bool	running() {return (_running);}
 		void	send(std::string input);
-		void	update();
+		std::string	update();
 	private:
 		void	_serverInput(std::string input);
 

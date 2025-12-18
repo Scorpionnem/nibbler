@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/17 10:36:54 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 15:26:24 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 15:15:38 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ class	GLFWDL : public GraphicsDL
 		}
 
 		void				open(GameState &gameState);
-		void				render(GameState &gameState);
+		void				render(int width, int height, const std::string &map);
 		GraphicsDL::Input	getInput();
 		void				stop();
 	private:

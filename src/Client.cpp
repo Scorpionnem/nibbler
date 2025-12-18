@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:38:41 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 10:55:43 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 15:16:44 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	Client::init(const char *ip, int port)
 	update();
 }
 
-void	Client::update()
+std::string	Client::update()
 {
 	FD_ZERO(&_readfds);
 	FD_SET(_sockFD, &_readfds);
@@ -52,8 +52,9 @@ void	Client::update()
 		if (bytes <= 0)
 			throw std::runtime_error("Server closed");
 		_buffer[bytes] = '\0';
-		_serverInput(_buffer);
+		return (_buffer);
 	}
+	return ("");
 }
 
 void	Client::_serverInput(std::string input)

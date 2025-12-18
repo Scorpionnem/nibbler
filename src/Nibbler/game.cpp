@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:04:57 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 13:09:17 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 15:15:03 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,9 @@ void	Nibbler::_runGame()
 {
 	while (_running)
 	{
+		std::string	serverInput;
 		try {
-			_serverClient.update();
+			serverInput = _serverClient.update();
 		} catch (const std::exception &e) {
 			_running = false;
 			break ;
@@ -71,7 +72,8 @@ void	Nibbler::_runGame()
 					break ;
 			}
 		} while (input != GraphicsDL::Input::NONE);
-		_graphicsDL->render(_gameState);
+		if (serverInput.size())
+			_graphicsDL->render(_gameState.getWidth(), _gameState.getHeight(), serverInput);
 	}
 }
 

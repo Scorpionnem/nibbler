@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:05:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 13:08:20 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 15:23:17 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,17 @@ class	GameState
 		static constexpr	int	MAX_HEIGHT = 30;
 		static constexpr	int	MIN_HEIGHT = 10;
 	public:
+		std::string	toString()
+		{
+			std::string	res;
+			for (Tile tile : _map)
+				res += std::to_string((int)tile);
+			for (Snake &part : _snake[0])
+				res[part.y * _width + part.x] = (3 + (part.part == SnakePart::HEAD)) + '0';
+			for (Snake &part : _snake[1])
+				res[part.y * _width + part.x] = (5 + (part.part == SnakePart::HEAD)) + '0';
+			return (res);
+		}
 		GameState() {}
 		GameState(int width, int height)
 		{
