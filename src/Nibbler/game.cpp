@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:04:57 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 11:40:31 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 13:09:17 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,6 @@ void	Nibbler::_runGame()
 			_running = false;
 			break ;
 		}
-		
-		struct timespec	currentFrame;
-		double			deltaTime;
-
-		clock_gettime(CLOCK_MONOTONIC, &currentFrame);
-		deltaTime = (currentFrame.tv_sec - _lastFrame.tv_sec) + (currentFrame.tv_nsec - _lastFrame.tv_nsec) * 1e-9;
-		_lastFrame = currentFrame;
 
 		GraphicsDL::Input	input;
 		do
@@ -41,19 +34,15 @@ void	Nibbler::_runGame()
 					break ;
 				case GraphicsDL::Input::RIGHT:
 					_serverClient.send("RIGHT");
-					_snakeDirection = GameState::SnakeDirection::RIGHT;
 					break ;
 				case GraphicsDL::Input::LEFT:
 					_serverClient.send("LEFT");
-					_snakeDirection = GameState::SnakeDirection::LEFT;
 					break ;
 				case GraphicsDL::Input::UP:
 					_serverClient.send("UP");
-					_snakeDirection = GameState::SnakeDirection::UP;
 					break ;
 				case GraphicsDL::Input::DOWN:
 					_serverClient.send("DOWN");
-					_snakeDirection = GameState::SnakeDirection::DOWN;
 					break ;
 				case GraphicsDL::Input::SWITCH1:
 				{
@@ -82,7 +71,6 @@ void	Nibbler::_runGame()
 					break ;
 			}
 		} while (input != GraphicsDL::Input::NONE);
-		updateSnake(deltaTime);
 		_graphicsDL->render(_gameState);
 	}
 }
@@ -95,6 +83,8 @@ void	Nibbler::updateSnake(double deltaTime)
 	if (lastUpdate < _updateDelay)
 		return ;
 	lastUpdate = 0;
-	if (!advanceSnake(_snakeDirection))
+	if (!advanceSnake(0, _snakeDirection[0]))
+		_running = false;
+	if (!advanceSnake(1, _snakeDirection[1]))
 		_running = false;
 }

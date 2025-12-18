@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:04:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 11:53:34 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 13:09:05 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <ctime>
 # include <thread>
 # include <atomic>
+# include <map>
 # include "Client.hpp"
 # include "Server.hpp"
 
@@ -36,12 +37,12 @@ class	Nibbler
 		void	_runGame();
 		bool	_checkDeath()
 		{
-			GameState::Snake	&head = _gameState.getSnakeHead();
+			GameState::Snake	&head = _gameState.getSnakeHead(0);
 
 			int	headX = head.x;
 			int	headY = head.y;
 
-			for (GameState::Snake &part : _gameState.getSnake())
+			for (GameState::Snake &part : _gameState.getSnake(0))
 				if (part.part != GameState::SnakePart::HEAD && part.x == headX && part.y == headY)
 					return (true);
 
@@ -49,9 +50,9 @@ class	Nibbler
 				return (true);
 			return (false);
 		}
-		bool	advanceSnake(GameState::SnakeDirection dir)
+		bool	advanceSnake(int player, GameState::SnakeDirection dir)
 		{
-			GameState::Snake	&head = _gameState.getSnakeHead();
+			GameState::Snake	&head = _gameState.getSnakeHead(player);
 
 			if (dir != GameState::SnakeDirection::NONE)
 			{
@@ -68,10 +69,10 @@ class	Nibbler
 			}
 
 			GameState::SnakeDirection	prevDir = head.dir;
-			GameState::Snake			lastTail = _gameState.getSnakeTail();
+			GameState::Snake			lastTail = _gameState.getSnakeTail(player);
 
 			try {
-				for (GameState::Snake &part : _gameState.getSnake())
+				for (GameState::Snake &part : _gameState.getSnake(player))
 					prevDir = _advanceSnakePart(part, prevDir);
 				if (_checkDeath())
 					throw std::runtime_error("You died!");
@@ -82,7 +83,7 @@ class	Nibbler
 				if (_gameState.getTile(headX, headY) == GameState::Tile::FOOD)
 				{
 					_gameState.setTile(GameState::Tile::EMPTY, headX, headY);
-					_gameState.growSnake(lastTail);
+					_gameState.growSnake(player, lastTail);
 					_gameState.spawnRandom(GameState::Tile::FOOD);
 				}
 			} catch (const std::exception &e) {
@@ -107,7 +108,6 @@ class	Nibbler
 		}
 		struct timespec				_lastFrame = {0, 0};
 		GraphicsDL::Input			_currentGDL;
-		GameState::SnakeDirection	_snakeDirection = GameState::SnakeDirection::RIGHT;
 
 		double	_updateDelay = 0.2;
 		int		_startFood = 1;
@@ -123,6 +123,8 @@ class	Nibbler
 		Server		_server;
 		std::thread	_serverThread;
 		bool		_hostServer = true;
+		std::map<int, int>	clientToPlayer;
+		GameState::SnakeDirection	_snakeDirection[2] = {GameState::SnakeDirection::RIGHT, GameState::SnakeDirection::RIGHT};
 
 		using GraphicsDLGetFn = GraphicsDL *(*)();
 		GraphicsDL	*_loadGraphicsDL(const char *path);

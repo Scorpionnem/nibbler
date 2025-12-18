@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/17 10:37:51 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 14:58:27 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 13:00:29 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,10 +78,16 @@ void	SDLDL::render(GameState &gameState)
 			y++;
 		}
 	}
-	for (GameState::Snake snake : gameState.getSnake())
+	for (GameState::Snake snake : gameState.getSnake(0))
 	{
 		SDL_Rect	rec = {snake.x * 32, snake.y * 32, 32, 32};
 		SDL_SetRenderDrawColor(_renderer, 0, 255 - (snake.part == GameState::SnakePart::HEAD) * 100, 0, 255);
+		SDL_RenderFillRect(_renderer, &rec);
+	}
+	for (GameState::Snake snake : gameState.getSnake(1))
+	{
+		SDL_Rect	rec = {snake.x * 32, snake.y * 32, 32, 32};
+		SDL_SetRenderDrawColor(_renderer, 0, 0, 255 - (snake.part == GameState::SnakePart::HEAD) * 100, 255);
 		SDL_RenderFillRect(_renderer, &rec);
 	}
 	SDL_RenderPresent(_renderer);

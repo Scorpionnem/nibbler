@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:05:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 10:02:33 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 13:08:20 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,10 +66,15 @@ class	GameState
 			_map.reserve(_width * _height);
 			for (int i = 0; i < _width * _height; i++)
 				_map.push_back(GameState::Tile::EMPTY);
-			_snake.push_back(Snake(SnakePart::HEAD, SnakeDirection::RIGHT, (_width / 2) + 1, _height / 2));
-			_snake.push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2), _height / 2));
-			_snake.push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2) - 1, _height / 2));
-			_snake.push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2) - 2, _height / 2));
+			spawnSnake(0, _height / 2 + 1);
+			spawnSnake(1, _height / 2 - 1);
+		}
+		void	spawnSnake(int player, int y)
+		{
+			_snake[player].push_back(Snake(SnakePart::HEAD, SnakeDirection::RIGHT, (_width / 2) + 1, y));
+			_snake[player].push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2), y));
+			_snake[player].push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2) - 1, y));
+			_snake[player].push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2) - 2, y));
 		}
 		GameState(const GameState &cpy)
 		{
@@ -82,7 +87,8 @@ class	GameState
 				_width = cpy._width;
 				_height = cpy._height;
 				_map = cpy._map;
-				_snake = cpy._snake;
+				_snake[0] = cpy._snake[0];
+				_snake[1] = cpy._snake[1];
 			}
 			return (*this);
 		}
@@ -91,7 +97,10 @@ class	GameState
 		{
 			if (getTile(x, y) != Tile::EMPTY)
 				return (false);
-			for (Snake &part : _snake)
+			for (Snake &part : _snake[0])
+				if (part.x == x && part.y == y)
+					return (false);
+			for (Snake &part : _snake[1])
 				if (part.x == x && part.y == y)
 					return (false);
 			return (true);
@@ -114,9 +123,9 @@ class	GameState
 			} while (!isFree(x, y));
 			setTile(tile, x, y);
 		}
-		void	growSnake(Snake lastTail)
+		void	growSnake(int player, Snake lastTail)
 		{
-			_snake.push_back(Snake(SnakePart::BODY, lastTail.dir, lastTail.x, lastTail.y));
+			_snake[player].push_back(Snake(SnakePart::BODY, lastTail.dir, lastTail.x, lastTail.y));
 		}
 
 		void	setTile(GameState::Tile tile, int x, int y)
@@ -132,12 +141,12 @@ class	GameState
 				throw std::runtime_error("getTile out of bounds");
 			return (_map[y * _width + x]);
 		}
-		Snake								&getSnakeHead()	{return (_snake.front());}
-		Snake								&getSnakeTail()	{return (_snake.back());}
+		Snake								&getSnakeHead(int player)	{return (_snake[player].front());}
+		Snake								&getSnakeTail(int player)	{return (_snake[player].back());}
 		int									getWidth()		{return (_width);}
 		int									getHeight()		{return (_height);}
 		const std::vector<GameState::Tile>	&getMap()		{return (_map);}
-		std::vector<GameState::Snake>		&getSnake()		{return (_snake);}
+		std::vector<GameState::Snake>		&getSnake(int player)		{return (_snake[player]);}
 	private:
 		void	setWidth(int w)
 		{
@@ -152,7 +161,7 @@ class	GameState
 			_height = h;
 		}
 		std::vector<GameState::Tile>	_map;
-		std::vector<Snake>				_snake;
+		std::vector<Snake>				_snake[2];
 		int								_width = 0;
 		int								_height = 0;
 };

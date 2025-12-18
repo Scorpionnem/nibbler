@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:03:02 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 11:58:14 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 13:11:01 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ int	Nibbler::_checkArgs(int ac, char **av)
 		return (0);
 	}
 	av += 3;
+
+	std::string	serverIP = "localhost";
 
 	try {
 		while (*av)
@@ -60,6 +62,14 @@ int	Nibbler::_checkArgs(int ac, char **av)
 			else if (std::string(*av) == "join")
 			{
 				_hostServer = false;
+				if (*(av + 1) && *(av + 2))
+				{
+					_serverPort = std::stoi(*(av + 1));
+					serverIP = *(av + 2);
+					av += 2;
+				}
+				else
+					throw std::runtime_error("host: invalid arguments!");
 			}
 			else if (std::string(*av) == "host")
 			{
@@ -99,7 +109,7 @@ int	Nibbler::_checkArgs(int ac, char **av)
 
 	try
 	{
-		_serverClient.init("localhost", _serverPort);
+		_serverClient.init(serverIP.c_str(), _serverPort);
 	} catch (const std::exception &e) {
 		std::cerr << "ServerClient: " << e.what() << std::endl;
 		if (_hostServer)
