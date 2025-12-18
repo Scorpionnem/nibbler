@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:05:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 15:59:57 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 17:18:03 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,10 +80,10 @@ class	GameState
 		}
 		void	spawnSnake(int player, int y)
 		{
-			_snake[player].push_back(Snake(SnakePart::HEAD, SnakeDirection::RIGHT, (_width / 2) + 1, y));
-			_snake[player].push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2), y));
+			_snake[player].push_back(Snake(SnakePart::HEAD, SnakeDirection::RIGHT, (_width / 2), y));
 			_snake[player].push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2) - 1, y));
 			_snake[player].push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2) - 2, y));
+			_snake[player].push_back(Snake(SnakePart::BODY, SnakeDirection::RIGHT, (_width / 2) - 3, y));
 		}
 		GameState(const GameState &cpy)
 		{
