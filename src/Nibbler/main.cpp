@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:04:26 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 11:41:16 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 11:54:20 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	Nibbler::start(int ac, char **av)
 
 void	Nibbler::_thread()
 {
-	_server.open(SERVER_PORT);
+	_server.open(_serverPort);
 	_server.setMessageCallback([this](const Server::Client &, const std::string &str)
 	{
 		(void)this;

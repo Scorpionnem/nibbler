@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:03:02 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 11:42:31 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 11:58:14 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,16 @@ int	Nibbler::_checkArgs(int ac, char **av)
 			{
 				_hostServer = false;
 			}
+			else if (std::string(*av) == "host")
+			{
+				if (*(av + 1))
+				{
+					_serverPort = std::stoi(*(av + 1));
+					av++;
+				}
+				else
+					throw std::runtime_error("host: invalid arguments!");
+			}
 			else
 				throw std::runtime_error("unknown option!");
 			av++;
@@ -82,14 +92,14 @@ int	Nibbler::_checkArgs(int ac, char **av)
 			std::cerr << "Server: " << e.what() << std::endl;
 			return (0);
 		}
-	
+
 		while (!_server_opened)
 			;
 	}
 
 	try
 	{
-		_serverClient.init("localhost", SERVER_PORT);
+		_serverClient.init("localhost", _serverPort);
 	} catch (const std::exception &e) {
 		std::cerr << "ServerClient: " << e.what() << std::endl;
 		if (_hostServer)

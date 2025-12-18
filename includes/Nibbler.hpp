@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:04:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 11:42:25 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 11:53:34 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,6 @@
 # include <atomic>
 # include "Client.hpp"
 # include "Server.hpp"
-
-# define SERVER_PORT 7003
 
 class	Nibbler
 {
@@ -113,6 +111,7 @@ class	Nibbler
 
 		double	_updateDelay = 0.2;
 		int		_startFood = 1;
+		int		_serverPort = 7001;
 
 		GameState			_gameState;
 		std::atomic_bool	_running;
