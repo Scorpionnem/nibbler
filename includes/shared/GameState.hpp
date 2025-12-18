@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:05:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 14:02:03 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 10:02:33 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,22 +86,7 @@ class	GameState
 			}
 			return (*this);
 		}
-		int	getWidth() {return (_width);}
-		int	getHeight() {return (_height);}
-		const std::vector<GameState::Tile>	&getMap() {return (_map);}
-		const std::vector<GameState::Snake>	&getSnake() {return (_snake);}
-		void	setTile(GameState::Tile tile, int x, int y)
-		{
-			if (x >= _width || x < 0 || y >= _height || y < 0)
-				throw std::runtime_error("setTile out of bounds");
-			_map[y * _width + x] = tile;
-		}
-		GameState::Tile	getTile(int x, int y)
-		{
-			if (x >= _width || x < 0 || y >= _height || y < 0)
-				throw std::runtime_error("getTile out of bounds");
-			return (_map[y * _width + x]);
-		}
+		
 		bool	isFree(int x, int y)
 		{
 			if (getTile(x, y) != Tile::EMPTY)
@@ -129,74 +114,31 @@ class	GameState
 			} while (!isFree(x, y));
 			setTile(tile, x, y);
 		}
-		bool	advanceSnake(SnakeDirection dir)
-		{
-			if (dir != SnakeDirection::NONE)
-			{
-				if (_snake.front().dir == SnakeDirection::LEFT && dir == SnakeDirection::RIGHT)
-					;
-				else if (_snake.front().dir == SnakeDirection::RIGHT && dir == SnakeDirection::LEFT)
-					;
-				else if (_snake.front().dir == SnakeDirection::UP && dir == SnakeDirection::DOWN)
-					;
-				else if (_snake.front().dir == SnakeDirection::DOWN && dir == SnakeDirection::UP)
-					;
-				else
-					_snake.front().dir = dir;
-			}
-			
-			SnakeDirection	prevDir = _snake.front().dir;
-			Snake	lastTail = _snake.back();
-			
-			for (Snake &part : _snake)
-				prevDir = _advanceSnakePart(part, prevDir);
-
-			if (_checkDeath())
-				return (false);
-
-			int	headX = _snake.front().x;
-			int	headY = _snake.front().y;
-
-			if (getTile(headX, headY) == Tile::FOOD)
-			{
-				setTile(Tile::EMPTY, headX, headY);
-				growSnake(lastTail);
-				spawnRandom(Tile::FOOD);
-			}
-			return (true);
-		}
 		void	growSnake(Snake lastTail)
 		{
 			_snake.push_back(Snake(SnakePart::BODY, lastTail.dir, lastTail.x, lastTail.y));
 		}
+
+		void	setTile(GameState::Tile tile, int x, int y)
+		{
+			if (x >= _width || x < 0 || y >= _height || y < 0)
+				throw std::runtime_error("setTile out of bounds");
+			_map[y * _width + x] = tile;
+		}
+
+		GameState::Tile	getTile(int x, int y)
+		{
+			if (x >= _width || x < 0 || y >= _height || y < 0)
+				throw std::runtime_error("getTile out of bounds");
+			return (_map[y * _width + x]);
+		}
+		Snake								&getSnakeHead()	{return (_snake.front());}
+		Snake								&getSnakeTail()	{return (_snake.back());}
+		int									getWidth()		{return (_width);}
+		int									getHeight()		{return (_height);}
+		const std::vector<GameState::Tile>	&getMap()		{return (_map);}
+		std::vector<GameState::Snake>		&getSnake()		{return (_snake);}
 	private:
-		bool	_checkDeath()
-		{
-			int	headX = _snake.front().x;
-			int	headY = _snake.front().y;
-			for (Snake &part : _snake)
-			{
-				if (part.part != SnakePart::HEAD && part.x == headX && part.y == headY)
-					return (true);
-			}
-			if (getTile(headX, headY) != Tile::FOOD && getTile(headX, headY) != Tile::EMPTY)
-				return (true);
-			return (false);
-		}
-		SnakeDirection	_advanceSnakePart(Snake &part, SnakeDirection nextDir)
-		{
-			if (part.dir == SnakeDirection::UP)
-				part.y -= 1;
-			if (part.dir == SnakeDirection::DOWN)
-				part.y += 1;
-			if (part.dir == SnakeDirection::LEFT)
-				part.x -= 1;
-			if (part.dir == SnakeDirection::RIGHT)
-				part.x += 1;
-			SnakeDirection	tmp = part.dir;
-			part.dir = nextDir;
-			return (tmp);
-		}
 		void	setWidth(int w)
 		{
 			if (w < MIN_WIDTH || w > MAX_WIDTH)

@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:04:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 13:54:23 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 10:10:07 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,78 @@ class	Nibbler
 
 		int	start(int ac, char **av);
 	private:
+		void	_runGame();
+		bool	_checkDeath()
+		{
+			GameState::Snake	&head = _gameState.getSnakeHead();
+
+			int	headX = head.x;
+			int	headY = head.y;
+
+			for (GameState::Snake &part : _gameState.getSnake())
+				if (part.part != GameState::SnakePart::HEAD && part.x == headX && part.y == headY)
+					return (true);
+
+			if (_gameState.getTile(headX, headY) != GameState::Tile::FOOD && _gameState.getTile(headX, headY) != GameState::Tile::EMPTY)
+				return (true);
+			return (false);
+		}
+		bool	advanceSnake(GameState::SnakeDirection dir)
+		{
+			GameState::Snake	&head = _gameState.getSnakeHead();
+
+			if (dir != GameState::SnakeDirection::NONE)
+			{
+				if (head.dir == GameState::SnakeDirection::LEFT && dir == GameState::SnakeDirection::RIGHT)
+					;
+				else if (head.dir == GameState::SnakeDirection::RIGHT && dir == GameState::SnakeDirection::LEFT)
+					;
+				else if (head.dir == GameState::SnakeDirection::UP && dir == GameState::SnakeDirection::DOWN)
+					;
+				else if (head.dir == GameState::SnakeDirection::DOWN && dir == GameState::SnakeDirection::UP)
+					;
+				else
+					head.dir = dir;
+			}
+
+			GameState::SnakeDirection	prevDir = head.dir;
+			GameState::Snake			lastTail = _gameState.getSnakeTail();
+
+			try {
+				for (GameState::Snake &part : _gameState.getSnake())
+					prevDir = _advanceSnakePart(part, prevDir);
+				if (_checkDeath())
+					throw std::runtime_error("You died!");
+
+				int	headX = head.x;
+				int	headY = head.y;
+
+				if (_gameState.getTile(headX, headY) == GameState::Tile::FOOD)
+				{
+					_gameState.setTile(GameState::Tile::EMPTY, headX, headY);
+					_gameState.growSnake(lastTail);
+					_gameState.spawnRandom(GameState::Tile::FOOD);
+				}
+			} catch (const std::exception &e) {
+				std::cout << e.what() << std::endl;
+				return (false);
+			}
+			return (true);
+		}
+		GameState::SnakeDirection	_advanceSnakePart(GameState::Snake &part, GameState::SnakeDirection nextDir)
+		{
+			if (part.dir == GameState::SnakeDirection::UP)
+				part.y -= 1;
+			if (part.dir == GameState::SnakeDirection::DOWN)
+				part.y += 1;
+			if (part.dir == GameState::SnakeDirection::LEFT)
+				part.x -= 1;
+			if (part.dir == GameState::SnakeDirection::RIGHT)
+				part.x += 1;
+			GameState::SnakeDirection	tmp = part.dir;
+			part.dir = nextDir;
+			return (tmp);
+		}
 		struct timespec				_lastFrame = {0, 0};
 		GraphicsDL::Input			_currentGDL;
 		GameState::SnakeDirection	_snakeDirection = GameState::SnakeDirection::RIGHT;
