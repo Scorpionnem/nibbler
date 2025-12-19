@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:04:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/19 10:48:17 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/19 13:11:06 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,9 @@ class	Nibbler
 	private:
 		void	_thread();
 		void	_runGame();
-		bool	_checkDeath()
+		bool	_checkDeath(int player)
 		{
-			GameState::Snake	&head = _gameState.getSnakeHead(0);
+			GameState::Snake	&head = _gameState.getSnakeHead(player);
 
 			int	headX = head.x;
 			int	headY = head.y;
@@ -77,7 +77,7 @@ class	Nibbler
 			try {
 				for (GameState::Snake &part : _gameState.getSnake(player))
 					prevDir = _advanceSnakePart(part, prevDir);
-				if (_checkDeath())
+				if (_checkDeath(player))
 					throw std::runtime_error("You died!");
 
 				int	headX = head.x;
