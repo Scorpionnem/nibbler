@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:38:41 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 15:16:44 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/19 10:54:43 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ void	Client::init(const char *ip, int port)
 		throw std::runtime_error(strerror(errno));
 
 	_running = true;
-	update();
 }
 
 std::string	Client::update()
