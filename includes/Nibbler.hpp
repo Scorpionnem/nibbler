@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:04:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 15:59:17 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/19 10:48:17 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,9 @@ class	Nibbler
 			int	headY = head.y;
 
 			for (GameState::Snake &part : _gameState.getSnake(0))
+				if (part.part != GameState::SnakePart::HEAD && part.x == headX && part.y == headY)
+					return (true);
+			for (GameState::Snake &part : _gameState.getSnake(1))
 				if (part.part != GameState::SnakePart::HEAD && part.x == headX && part.y == headY)
 					return (true);
 
