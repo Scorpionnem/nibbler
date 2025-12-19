@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 13:04:59 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/19 13:11:06 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/19 13:16:49 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,10 @@ class	Nibbler
 			int	headY = head.y;
 
 			for (GameState::Snake &part : _gameState.getSnake(0))
-				if (part.part != GameState::SnakePart::HEAD && part.x == headX && part.y == headY)
+				if (part.x == headX && part.y == headY && &part != &head)
 					return (true);
 			for (GameState::Snake &part : _gameState.getSnake(1))
-				if (part.part != GameState::SnakePart::HEAD && part.x == headX && part.y == headY)
+				if (part.x == headX && part.y == headY && &part != &head)
 					return (true);
 
 			if (_gameState.getTile(headX, headY) != GameState::Tile::FOOD && _gameState.getTile(headX, headY) != GameState::Tile::EMPTY)
