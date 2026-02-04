@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/17 10:37:51 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 14:58:27 by mbatty           ###   ########.fr       */
+/*   Updated: 2026/02/04 11:05:21 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,21 +42,33 @@ void	SDLDL::render(GameState &gameState)
 	int	x = 0;
 	int	y = 0;
 	
-	for (GameState::Tile tile : gameState.getMap())
+	for (Tile tile : gameState.getTiles())
 	{
+		SDL_Rect	rec = {x * 32, y * 32, 32, 32};
+		
 		switch (tile)
 		{
-			case GameState::Tile::WALL:
+			case Tile::WALL:
 			{
-				SDL_Rect	rec = {x * 32, y * 32, 32, 32};
 				SDL_SetRenderDrawColor(_renderer, 100, 100, 100, 255);
 				SDL_RenderFillRect(_renderer, &rec);
 				break ;
 			}
-			case GameState::Tile::FOOD:
+			case Tile::GREEN_APPLE:
 			{
-				SDL_Rect	rec = {x * 32, y * 32, 32, 32};
 				SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
+				SDL_RenderFillRect(_renderer, &rec);
+				break ;
+			}
+			case Tile::SNAKE_BODY:
+			{
+				SDL_SetRenderDrawColor(_renderer, 0, 255, 0, 255);
+				SDL_RenderFillRect(_renderer, &rec);
+				break ;
+			}
+			case Tile::SNAKE_HEAD:
+			{
+				SDL_SetRenderDrawColor(_renderer, 0, 200, 0, 255);
 				SDL_RenderFillRect(_renderer, &rec);
 				break ;
 			}
@@ -64,7 +76,6 @@ void	SDLDL::render(GameState &gameState)
 			{
 				if ((x + y) % 2)
 				{
-					SDL_Rect	rec = {x * 32, y * 32, 32, 32};
 					SDL_SetRenderDrawColor(_renderer, 6, 6, 6, 255);
 					SDL_RenderFillRect(_renderer, &rec);
 				}
@@ -78,12 +89,12 @@ void	SDLDL::render(GameState &gameState)
 			y++;
 		}
 	}
-	for (GameState::Snake snake : gameState.getSnake())
-	{
-		SDL_Rect	rec = {snake.x * 32, snake.y * 32, 32, 32};
-		SDL_SetRenderDrawColor(_renderer, 0, 255 - (snake.part == GameState::SnakePart::HEAD) * 100, 0, 255);
-		SDL_RenderFillRect(_renderer, &rec);
-	}
+	// for (Snake snake : gameState.getSnake())
+	// {
+	// 	SDL_Rect	rec = {snake.x * 32, snake.y * 32, 32, 32};
+	// 	SDL_SetRenderDrawColor(_renderer, 0, 255 - (snake.part == SnakePart::HEAD) * 100, 0, 255);
+	// 	SDL_RenderFillRect(_renderer, &rec);
+	// }
 	SDL_RenderPresent(_renderer);
 }
 
