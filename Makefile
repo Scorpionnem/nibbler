@@ -10,8 +10,6 @@ SRCS =	src/main.cpp\
 		src/Nibbler/game.cpp\
 		src/Nibbler/parsing.cpp\
 		src/Nibbler/main.cpp\
-		src/Client.cpp\
-		src/Server.cpp
 
 OBJDIR = obj
 OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)
@@ -43,14 +41,14 @@ $(OBJDIR)/%.o: %.cpp
 
 clean:
 	@echo Cleaning objects
-	@make -C glfw clean
-	@make -C sdl clean
+	@make -C glfw clean --no-print-directory
+	@make -C sdl clean --no-print-directory
 	@rm -rf $(OBJDIR)
 
 fclean: clean
 	@echo Cleaning $(NAME)
-	@make -C glfw fclean
-	@make -C sdl fclean
+	@make -C glfw fclean --no-print-directory
+	@make -C sdl fclean --no-print-directory
 	@rm -rf $(NAME)
 
 .PHONY: all clean fclean run re glfw sdl

@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/17 10:37:51 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 15:23:30 by mbatty           ###   ########.fr       */
+/*   Updated: 2026/02/04 11:05:21 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,124 +34,65 @@ void	SDLDL::open(GameState &gameState)
 		throw std::runtime_error("Error creating renderer");
 }
 
-void	SDLDL::render(int width, int height, const std::string &map)
+void	SDLDL::render(GameState &gameState)
 {
-	(void)width;(void)height;(void)map;
-	if ((size_t)(width * height) != map.size())
-		return ;
 	SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 255);
 	SDL_RenderClear(_renderer);
 
-	for (int y = 0; y < height; y++)
+	int	x = 0;
+	int	y = 0;
+	
+	for (Tile tile : gameState.getTiles())
 	{
-		for (int x = 0; x < width; x++)
+		SDL_Rect	rec = {x * 32, y * 32, 32, 32};
+		
+		switch (tile)
 		{
-			switch (map[y * width + x])
+			case Tile::WALL:
 			{
-				case '0': //EMPTY
+				SDL_SetRenderDrawColor(_renderer, 100, 100, 100, 255);
+				SDL_RenderFillRect(_renderer, &rec);
+				break ;
+			}
+			case Tile::GREEN_APPLE:
+			{
+				SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
+				SDL_RenderFillRect(_renderer, &rec);
+				break ;
+			}
+			case Tile::SNAKE_BODY:
+			{
+				SDL_SetRenderDrawColor(_renderer, 0, 255, 0, 255);
+				SDL_RenderFillRect(_renderer, &rec);
+				break ;
+			}
+			case Tile::SNAKE_HEAD:
+			{
+				SDL_SetRenderDrawColor(_renderer, 0, 200, 0, 255);
+				SDL_RenderFillRect(_renderer, &rec);
+				break ;
+			}
+			default:
+			{
+				if ((x + y) % 2)
 				{
-					if ((x + y) % 2)
-					{
-						SDL_Rect	rec = {x * 32, y * 32, 32, 32};
-						SDL_SetRenderDrawColor(_renderer, 6, 6, 6, 255);
-						SDL_RenderFillRect(_renderer, &rec);
-					}
-					break ;
-				}
-				case '1': //WALL
-				{
-					SDL_Rect	rec = {x * 32, y * 32, 32, 32};
-					SDL_SetRenderDrawColor(_renderer, 100, 100, 100, 255);
+					SDL_SetRenderDrawColor(_renderer, 6, 6, 6, 255);
 					SDL_RenderFillRect(_renderer, &rec);
-					break ;
 				}
-				case '2': //FOOD
-				{
-					SDL_Rect	rec = {x * 32, y * 32, 32, 32};
-					SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
-					SDL_RenderFillRect(_renderer, &rec);
-					break ;
-				}
-				case '3': //P1 Body
-				{
-					SDL_Rect	rec = {x * 32, y * 32, 32, 32};
-					SDL_SetRenderDrawColor(_renderer, 0, 255, 0, 255);
-					SDL_RenderFillRect(_renderer, &rec);
-					break ;
-				}
-				case '4': //P1 Head
-				{
-					SDL_Rect	rec = {x * 32, y * 32, 32, 32};
-					SDL_SetRenderDrawColor(_renderer, 0, 155, 0, 255);
-					SDL_RenderFillRect(_renderer, &rec);
-					break ;
-				}
-				case '5': //P2 Body
-				{
-					SDL_Rect	rec = {x * 32, y * 32, 32, 32};
-					SDL_SetRenderDrawColor(_renderer, 0, 0, 255, 255);
-					SDL_RenderFillRect(_renderer, &rec);
-					break ;
-				}
-				case '6': //P2 Head
-				{
-					SDL_Rect	rec = {x * 32, y * 32, 32, 32};
-					SDL_SetRenderDrawColor(_renderer, 0, 0, 155, 255);
-					SDL_RenderFillRect(_renderer, &rec);
-					break ;
-				}
+				break ;
 			}
 		}
+		x++;
+		if (x >= gameState.getWidth())
+		{
+			x = 0;
+			y++;
+		}
 	}
-	// int	x = 0;
-	// int	y = 0;
-	
-	// for (GameState::Tile tile : gameState.getMap())
-	// {
-	// 	switch (tile)
-	// 	{
-	// 		case GameState::Tile::WALL:
-	// 		{
-	// 			SDL_Rect	rec = {x * 32, y * 32, 32, 32};
-	// 			SDL_SetRenderDrawColor(_renderer, 100, 100, 100, 255);
-	// 			SDL_RenderFillRect(_renderer, &rec);
-	// 			break ;
-	// 		}
-	// 		case GameState::Tile::FOOD:
-	// 		{
-	// 			SDL_Rect	rec = {x * 32, y * 32, 32, 32};
-	// 			SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
-	// 			SDL_RenderFillRect(_renderer, &rec);
-	// 			break ;
-	// 		}
-	// 		default:
-	// 		{
-	// 			if ((x + y) % 2)
-	// 			{
-	// 				SDL_Rect	rec = {x * 32, y * 32, 32, 32};
-	// 				SDL_SetRenderDrawColor(_renderer, 6, 6, 6, 255);
-	// 				SDL_RenderFillRect(_renderer, &rec);
-	// 			}
-	// 			break ;
-	// 		}
-	// 	}
-	// 	x++;
-	// 	if (x >= gameState.getWidth())
-	// 	{
-	// 		x = 0;
-	// 		y++;
-	// 	}
-	// }
-	// for (GameState::Snake snake : gameState.getSnake(0))
+	// for (Snake snake : gameState.getSnake())
 	// {
 	// 	SDL_Rect	rec = {snake.x * 32, snake.y * 32, 32, 32};
-	// 	SDL_SetRenderDrawColor(_renderer, 0, 255 - (snake.part == GameState::SnakePart::HEAD) * 100, 0, 255);
-	// 	SDL_RenderFillRect(_renderer, &rec);
-	// }
-	// for (GameState::Snake snake : gameState.getSnake(1))
-	// {
-	// 	SDL_Rect	rec = {snake.x * 32, snake.y * 32, 32, 32};
-	// 	SDL_SetRenderDrawColor(_renderer, 0, 0, 255 - (snake.part == GameState::SnakePart::HEAD) * 100, 255);
+	// 	SDL_SetRenderDrawColor(_renderer, 0, 255 - (snake.part == SnakePart::HEAD) * 100, 0, 255);
 	// 	SDL_RenderFillRect(_renderer, &rec);
 	// }
 	SDL_RenderPresent(_renderer);
