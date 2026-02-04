@@ -6,7 +6,11 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 10:03:02 by mbatty            #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2026/02/04 10:54:00 by mbatty           ###   ########.fr       */
+=======
+/*   Updated: 2025/12/18 16:01:09 by mbatty           ###   ########.fr       */
+>>>>>>> main
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +34,8 @@ int	Nibbler::_checkArgs(int ac, char **av)
 		return (0);
 	}
 	av += 3;
+
+	std::string	serverIP = "localhost";
 
 	try {
 		while (*av)
@@ -58,6 +64,32 @@ int	Nibbler::_checkArgs(int ac, char **av)
 				else
 					throw std::runtime_error("start_food: invalid arguments!");
 			}
+<<<<<<< HEAD
+=======
+			else if (std::string(*av) == "join")
+			{
+				_hostServer = false;
+				if (*(av + 1) && *(av + 2))
+				{
+					_serverPort = std::stoi(*(av + 1));
+					serverIP = *(av + 2);
+					av += 2;
+				}
+				else
+					throw std::runtime_error("host: invalid arguments!");
+			}
+			else if (std::string(*av) == "host")
+			{
+				_multiplayer = true;
+				if (*(av + 1))
+				{
+					_serverPort = std::stoi(*(av + 1));
+					av++;
+				}
+				else
+					throw std::runtime_error("host: invalid arguments!");
+			}
+>>>>>>> main
 			else
 				throw std::runtime_error("unknown option!");
 			av++;
@@ -68,5 +100,45 @@ int	Nibbler::_checkArgs(int ac, char **av)
 		return (0);
 	}
 
+<<<<<<< HEAD
+=======
+	while (_startFood--)
+		_gameState.spawnRandom(GameState::Tile::FOOD);
+
+	if (_multiplayer)
+	{
+		_gameState.spawnSnake(0, _gameState.getHeight() / 2 + 1);
+		_gameState.spawnSnake(1, _gameState.getHeight() / 2 - 1);
+	}
+	else
+		_gameState.spawnSnake(0, _gameState.getHeight() / 2);
+
+	if (_hostServer)
+	{
+		try {
+			_serverThread = std::thread(&Nibbler::_thread, this);
+		} catch (const std::exception &e) {
+			std::cerr << "Server: " << e.what() << std::endl;
+			return (0);
+		}
+
+		while (!_server_opened)
+			;
+	}
+
+	try
+	{
+		_serverClient.init(serverIP.c_str(), _serverPort);
+	} catch (const std::exception &e) {
+		std::cerr << "ServerClient: " << e.what() << std::endl;
+		if (_hostServer)
+		{
+			_running = false;
+			_serverThread.join();
+		}
+		return (0);
+	}
+
+>>>>>>> main
 	return (1);
 }

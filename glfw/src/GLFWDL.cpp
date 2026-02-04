@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/17 14:52:12 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/17 15:30:54 by mbatty           ###   ########.fr       */
+/*   Updated: 2025/12/18 15:15:53 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,12 @@ void	GLFWDL::open(GameState &gameState)
 	glfwSetWindowUserPointer(_window, this);
 }
 
-void	GLFWDL::render(GameState &gameState)
+void	GLFWDL::render(int width, int height, const std::string &map)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glfwSwapBuffers(_window);
-	(void)gameState;
+	(void)width;(void)height;(void)map;
 }
 
 GraphicsDL::Input	GLFWDL::getInput()
