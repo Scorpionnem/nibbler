@@ -6,7 +6,7 @@
 /*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/04 10:34:48 by mbatty            #+#    #+#             */
-/*   Updated: 2026/02/04 11:06:01 by mbatty           ###   ########.fr       */
+/*   Updated: 2026/02/04 11:17:38 by mbatty           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ class	Game
 			if (_checkFood())
 			{
 				_snake->grow();
+				_setTile(Tile::EMPTY, _snake->getHead().pos);
+				_generateFood();
 				return (Event::GROW_SNAKE);
 			}
 			if (_checkBadFood())
@@ -76,8 +78,8 @@ class	Game
 
 			_spawnSnake();
 
-			// _generateFood();
-			// _generateFood();
+			_generateFood();
+			_generateFood();
 
 			_dead = false;
 		}
