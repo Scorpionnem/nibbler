@@ -1,56 +1,50 @@
-CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -MMD -MP -g
+NAME :=	Nibbler
 
-INCLUDES = -I includes -I includes/shared
+CXX :=		c++
+CXXFLAGS :=	-g -MP -MMD -Wall -Wextra -Werror -std=c++17 -O3 -pthread
 
-NAME = nibbler
+INC_DIR :=	inc/
+SRC_DIR :=	src/
+OBJ_DIR :=	.obj/
 
-SRCS =	src/main.cpp\
-		src/Nibbler/dl.cpp\
-		src/Nibbler/game.cpp\
-		src/Nibbler/parsing.cpp\
-		src/Nibbler/main.cpp\
+INCLUDE_DIRS :=	-I$(INC_DIR)
+LFLAGS :=		-ldl
 
-OBJDIR = obj
-OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)
-DEPS = $(SRCS:%.cpp=$(OBJDIR)/%.d)
+SRCS :=	$(addprefix $(SRC_DIR),			\
+			main.cpp					\
+			Nibbler.cpp					\
+		)
 
-all: sdl glfw
-	@make -j compile --no-print-directory
+OBJS :=	$(SRCS:%.cpp=$(OBJ_DIR)%.o)
+DEPS :=	$(SRCS:%.cpp=$(OBJ_DIR)%.d)
 
-compile: $(NAME)
+SDL_SO := libs/sdl/nibbler_sdl.so
+# GLFW_SO := libs/glfw/nibbler_glfw.so
+# SFML_SO := libs/sfml/nibbler_sfml.so
 
-glfw:
-	@make -C glfw/ all --no-print-directory
-	@cp glfw/glfw.so .
+all: $(SDL_SO) $(NAME)
 
-sdl:
-	@make -C sdl/ all --no-print-directory
-	@cp sdl/sdl.so .
+$(NAME): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LFLAGS)
+
+$(OBJ_DIR)%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(INCLUDE_DIRS) -c $< -o $@
+
+$(SDL_SO):
+	@make -C libs/sdl/ all --no-print-directory
+
+clean:
+	@make -C libs/sdl/ clean --no-print-directory
+	rm -rf $(OBJ_DIR)
+
+fclean:
+	@make -C libs/sdl/ fclean --no-print-directory
+	rm -rf $(OBJ_DIR)
+	rm -rf $(NAME)
 
 re: fclean all
 
-$(NAME): $(OBJS)
-	@echo Compiling $(NAME)
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^
-
-$(OBJDIR)/%.o: %.cpp
-	@mkdir -p $(dir $@)
-	@echo Compiling $<
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
-
-clean:
-	@echo Cleaning objects
-	@make -C glfw clean --no-print-directory
-	@make -C sdl clean --no-print-directory
-	@rm -rf $(OBJDIR)
-
-fclean: clean
-	@echo Cleaning $(NAME)
-	@make -C glfw fclean --no-print-directory
-	@make -C sdl fclean --no-print-directory
-	@rm -rf $(NAME)
-
-.PHONY: all clean fclean run re glfw sdl
+.PHONY: all clean fclean re
 
 -include $(DEPS)

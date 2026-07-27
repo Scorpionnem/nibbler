@@ -1,65 +1,38 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mbatty <mbatty@student.42angouleme.fr>     +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/31 14:03:18 by mbatty            #+#    #+#             */
-/*   Updated: 2025/12/18 10:38:13 by mbatty           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include <ctime>
 
-# include <iostream>
-# include "GameState.hpp"
-# include "Nibbler.hpp"
+#include "Nibbler.hpp"
 
-/*
-int	g_sig = 0;
+#define MIN_SIZE 10
+#define MAX_SIZE 42
 
-void	handleSig(int sig)
+void    usage()
 {
-	g_sig = sig;
+    std::cerr << "Usage:\n  ./Nibbler [width] [height]\n\n";
+    std::cerr << "min size: " << MIN_SIZE << '\n';
+    std::cerr << "max size: " << MAX_SIZE << std::endl;
 }
 
-int	main(void)
+int main(int ac, char **av)
 {
-	signal(SIGINT, handleSig);
+    if (ac != 3)
+    {
+        return (usage(), 1);
+    }
 
-	Server	server;
-	server.setConnectCallback([]
-		(const Server::Client &client)
-		{
-			std::cout << "Connect callback for client: " << client.fd() << std::endl;
-		});
-	server.setDisconnectCallback([]
-		(const Server::Client &client)
-		{
-			std::cout << "Disconnect callback for client: " << client.fd() << std::endl;
-		});
-	server.setMessageCallback([&server]
-		(const Server::Client &client, const std::string &msg)
-		{
-			server.sendAll(client, msg);
-			std::cout << "Message callback for client: " << client.fd() << " : " << msg << std::endl;
-		});
+    int width = std::atoi(av[1]);
+    int height = std::atoi(av[2]);
+    if (width < MIN_SIZE || width > MAX_SIZE
+        || height < MIN_SIZE || height > MAX_SIZE)
+    {
+        return (usage(), 1);
+    }
 
-	try {
-		server.open(6942);
-		while (g_sig == 0)
-			server.update();
-		server.close();
-	} catch (const std::exception &e) {
-		std::cerr << e.what() << std::endl;
-	}
-}
-*/
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-int	main(int ac, char **av)
-{
-	srand(std::time(NULL));
+    Nibbler nib;
 
-	Nibbler	nibbler;
+    if (nib.play(width, height) == -1)
+        return (1);
 
-	return (nibbler.start(ac, av));
+    return (0);
 }
