@@ -8,9 +8,9 @@
 
 const char *libsParhs[3] =
 {
+    "libs/caca/nibbler_caca.so",
     "libs/sdl/nibbler_sdl.so",
     "libs/glfw/nibbler_glfw.so",
-    "libs/sfml/nibbler_sfml.so",
 };
 
 int Nibbler::play(int width, int height)
