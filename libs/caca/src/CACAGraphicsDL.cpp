@@ -6,13 +6,13 @@
 /*   By: mbirou <mbirou@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/26 10:05:00 by mbirou            #+#    #+#             */
-/*   Updated: 2026/08/26 16:14:09 by mbirou           ###   ########.fr       */
+/*   Updated: 2026/08/30 18:00:45 by mbirou           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CACAGraphicsDL.hpp"
 
-#define TILE_SIZE 2 // this determines the height in chracter of the square, width is height * 2 - 1
+#define TILE_SIZE 2
 
 CACAGraphicsDL::~CACAGraphicsDL()
 {
@@ -24,7 +24,8 @@ void	CACAGraphicsDL::open(const GameState &gameState)
 	_canvas = NULL;
 	_display = NULL;
 
-	_canvas = caca_create_canvas(gameState.width() * (TILE_SIZE * 2 - 1) + 1, gameState.height() * TILE_SIZE);
+	setenv("SDL_VIDEO_WINDOW_POS", "center", 1);
+	_canvas = caca_create_canvas(gameState.width() * TILE_SIZE + 2, gameState.height() * (TILE_SIZE / 2.) + 1);
 	_display = caca_create_display(_canvas);
 	caca_set_display_title(_display, "CACA");
 }
@@ -34,7 +35,7 @@ void	setColor(caca_canvas_t *canvas, Tile tile)
 	switch (tile)
 	{
 		case Tile::WALL:
-			caca_set_color_ansi(canvas, CACA_TRANSPARENT, CACA_BLACK);
+			caca_set_color_ansi(canvas, CACA_BLUE, CACA_BLACK);
 			break;
 		case Tile::SNAKE_HEAD:
 			caca_set_color_ansi(canvas, CACA_GREEN, CACA_BLACK);
@@ -55,7 +56,7 @@ void	setColor(caca_canvas_t *canvas, Tile tile)
 
 #include <string>
 
-void	placeSquare(caca_canvas_t *canvas, const int &x, const int &y, bool edges[4]) // edges -> W,N,E,S
+void	placeSquare(caca_canvas_t *canvas, const int &x, const int &y, const Edges &edges)
 {
 	for (int yi = 0; yi < TILE_SIZE; ++yi)
 	{
@@ -67,23 +68,25 @@ void	placeSquare(caca_canvas_t *canvas, const int &x, const int &y, bool edges[4
 			{
 				if (xi == 0)
 				{
-					if (edges[0] && edges[1])
+					if ((edges.W && edges.N)
+						|| edges.NW)
 						ch = "╋";
-					else if (edges[0])
+					else if (edges.W)
 						ch = "┳";
-					else if (edges[1])
+					else if (edges.N)
 						ch = "┣";
 					else
 						ch = "┏";
 				}
 				else if (xi == TILE_SIZE * 2 - 2)
 				{
-					if (edges[1] && edges[2])
-						ch = "╋";
-					else if (edges[1])
+					if ((edges.N && edges.E)
+						|| edges.NE)
+						ch = "╋━";
+					else if (edges.N)
 						ch = "┫";
-					else if (edges[2])
-						ch = "┳";
+					else if (edges.E)
+						ch = "┳━";
 					else
 						ch = "┓";
 				}
@@ -94,22 +97,24 @@ void	placeSquare(caca_canvas_t *canvas, const int &x, const int &y, bool edges[4
 			{
 				if (xi == 0)
 				{
-					if (edges[3] && edges[0])
+					if ((edges.S && edges.W)
+						|| edges.SW)
 						ch = "╋";
-					else if (edges[3])
+					else if (edges.S)
 						ch = "┣";
-					else if (edges[0])
+					else if (edges.W)
 						ch = "┻";
 					else
 						ch = "┗";
 				}
 				else if (xi == TILE_SIZE * 2 - 2)
 				{
-					if (edges[2] && edges[3])
-						ch = "╋";
-					else if (edges[2])
-						ch = "┻";
-					else if (edges[3])
+					if ((edges.E && edges.S)
+						|| edges.SE)
+						ch = "╋━";
+					else if (edges.E)
+						ch = "┻━";
+					else if (edges.S)
 						ch = "┫";
 					else
 						ch = "┛";
@@ -120,9 +125,46 @@ void	placeSquare(caca_canvas_t *canvas, const int &x, const int &y, bool edges[4
 			else if (xi == 0 || xi == TILE_SIZE * 2 - 2)
 				ch = "┃";
 
-			caca_put_str(canvas, xi + x * (TILE_SIZE * 2 - 1), yi + y * TILE_SIZE, ch.c_str());
+			caca_put_str(canvas, xi + x * (TILE_SIZE), yi + y, ch.c_str());
 		}
 	}
+}
+
+void	placeLine(caca_canvas_t *canvas, const int &x, const int &y, const int &width, const int &height)
+{
+	std::string ch = " ";
+	if (x == 0 || x == height - 1)
+	{
+		for (int yi = 0; yi < TILE_SIZE; ++yi)
+		{
+			ch = (y == 0 ? (x == 0 ? "┏" : "┓") : y - (TILE_SIZE - 1 - yi) == width - 1 ? (x == height - 1 ? "┛" : "┗") : "┃");
+			caca_put_str(canvas, x * (TILE_SIZE) + ((x == width - 1) * (TILE_SIZE * 2 - 2)), yi + y, ch.c_str());
+		}
+	}
+	else
+	{
+		for (int xi = 0; xi < TILE_SIZE * 2 - 1; ++xi)
+		{
+			ch = (x == 0 ? (y == 0 ? "┏" : "┗") : x == width - 1 ? (y == height - 1 ? "┓" : "┛") : "━");
+			caca_put_str(canvas, xi + x * (TILE_SIZE), y + ((y == height - 1) * (TILE_SIZE - 1)), ch.c_str());
+		}
+	}
+}
+
+Edges	setupAdjacents(const std::vector<Tile> &tiles, const int &i,const int &width)
+{
+	Edges	edges;
+
+	edges.W		= tiles[i - 1]			!= Tile::EMPTY && tiles[i - 1]			!= Tile::WALL;
+	edges.NW	= tiles[i - width - 1]	!= Tile::EMPTY && tiles[i - width - 1]	!= Tile::WALL;
+	edges.N		= tiles[i - width]		!= Tile::EMPTY && tiles[i - width]		!= Tile::WALL;
+	edges.NE	= tiles[i - width + 1]	!= Tile::EMPTY && tiles[i - width + 1]	!= Tile::WALL;
+	edges.E		= tiles[i + 1]			!= Tile::EMPTY && tiles[i + 1]			!= Tile::WALL;
+	edges.SE	= tiles[i + width + 1]	!= Tile::EMPTY && tiles[i + width + 1]	!= Tile::WALL;
+	edges.S		= tiles[i + width]		!= Tile::EMPTY && tiles[i + width]		!= Tile::WALL;
+	edges.SW	= tiles[i + width - 1]	!= Tile::EMPTY && tiles[i + width - 1]	!= Tile::WALL;
+
+	return (edges);
 }
 
 void	CACAGraphicsDL::render(const GameState &gameState)
@@ -136,8 +178,10 @@ void	CACAGraphicsDL::render(const GameState &gameState)
 	const std::vector<Tile>	&tiles = gameState.tiles();
 	uint32_t				width = gameState.width();
 	uint32_t				height = gameState.height();
+	Edges					edges;
 
-	int headSave[2] = {0};
+	TileSave				head;
+	std::vector<TileSave>	saves;
 
 	for (size_t i = 0; i < tiles.size(); i++)
 	{
@@ -146,22 +190,37 @@ void	CACAGraphicsDL::render(const GameState &gameState)
 
 		if (tiles[i] == Tile::EMPTY)
 			continue ;
-
 		if (tiles[i] == Tile::SNAKE_HEAD)
 		{
-			headSave[0] = x;
-			headSave[1] = y;
+			head.pos[0] = x;
+			head.pos[1] = y;
+			head.edges = setupAdjacents(tiles, i, width);
+			head.tile = tiles[i];
+			continue;
+		}
+		if (tiles[i] != Tile::SNAKE_BODY && tiles[i] != Tile::WALL)
+		{
+			saves.push_back({tiles[i], x, y, setupAdjacents(tiles, i, width)});
 			continue;
 		}
 
 		setColor(_canvas, tiles[i]);
-		if (tiles[i] != Tile::WALL)
-			placeSquare(_canvas, x, y, (bool[4]){tiles[i - 1] == Tile::SNAKE_BODY, tiles[i - width] == Tile::SNAKE_BODY, tiles[i + 1] == Tile::SNAKE_BODY, tiles[i + width] == Tile::SNAKE_BODY});
+		if (tiles[i] == Tile::SNAKE_BODY)
+		{
+			edges = setupAdjacents(tiles, i, width);
+			placeSquare(_canvas, x, y, edges);
+		}
 		else
-			placeSquare(_canvas, x, y, (bool[4]){(y == 0 || y == (int)height - 1) && x > 0, (x == 0 || x == (int)width - 1) && y > 0, (y == 0 || y == (int)height - 1) && x < (int)width - 1,  (x == 0 || x == (int)width - 1) && y < (int)height - 1});
+			placeLine(_canvas, x, y, width, height);
 	}
 	setColor(_canvas, Tile::SNAKE_HEAD);
-	placeSquare(_canvas, headSave[0], headSave[1], (bool[4]){false, false, false, false});
+	placeSquare(_canvas, head.pos[0], head.pos[1], head.edges);
+
+	for (auto save : saves)
+	{
+		setColor(_canvas, save.tile);
+		placeSquare(_canvas, save.pos[0], save.pos[1], save.edges);
+	}
 
 	caca_refresh_display(_display);
 }
@@ -202,6 +261,8 @@ GraphicsDL::Input	CACAGraphicsDL::getInput()
 					return (GraphicsDL::Input::SWITCH2);
 				case '3':
 					return (GraphicsDL::Input::SWITCH3);
+				case ' ':
+					return (GraphicsDL::Input::PAUSE);
 				default:
 					break ;
 			}

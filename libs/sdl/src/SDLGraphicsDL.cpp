@@ -115,6 +115,8 @@ GraphicsDL::Input	SDLGraphicsDL::getInput()
 					return (GraphicsDL::Input::SWITCH2);
 				case SDLK_3:
 					return (GraphicsDL::Input::SWITCH3);
+				case SDLK_SPACE:
+					return (GraphicsDL::Input::PAUSE);
 				default:
 					break ;
 			}

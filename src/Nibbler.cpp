@@ -48,10 +48,11 @@ int Nibbler::play(int width, int height)
                 _gdl->open(_buildState());
         }
 
-        if (!_tick())
+        if (!_paused && !_tick())
             break ;
 
-        _gdl->render(_buildState());
+		if (!_paused)
+       		_gdl->render(_buildState());
 
         if (_running)
             usleep(200000);
@@ -144,6 +145,9 @@ void    Nibbler::_handleInput(GraphicsDL::Input in)
         case GraphicsDL::Input::SWITCH3:
             _pendingSwitch = 2;
             return ;
+		case GraphicsDL::Input::PAUSE:
+			_paused = !_paused;
+			return ;
         default:
             return ;
     }

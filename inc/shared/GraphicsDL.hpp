@@ -16,6 +16,8 @@ class	GraphicsDL
 			SWITCH1,
 			SWITCH2,
 			SWITCH3,
+
+			PAUSE,
 			
 			NONE,
 		};

@@ -6,7 +6,7 @@
 /*   By: mbirou <mbirou@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/26 10:04:54 by mbirou            #+#    #+#             */
-/*   Updated: 2026/08/26 11:14:27 by mbirou           ###   ########.fr       */
+/*   Updated: 2026/08/30 16:43:24 by mbirou           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,25 @@
 
 #include "caca.h"
 #include "shared/GraphicsDL.hpp"
+
+struct	Edges
+{
+	bool	W;
+	bool	NW;
+	bool	N;
+	bool	NE;
+	bool	E;
+	bool	SE;
+	bool	S;
+	bool	SW;
+};
+
+struct	TileSave
+{
+	Tile	tile;
+	int		pos[2];
+	Edges	edges;
+};
 
 class	CACAGraphicsDL : public GraphicsDL
 {

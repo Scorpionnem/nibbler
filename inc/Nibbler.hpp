@@ -35,6 +35,7 @@ class   Nibbler
         int _height = 0;
 
         bool    _running = false;
+        bool    _paused = false;
 
         std::deque<Vec2i>   _snake;
         Direction   _dir = Direction::RIGHT;
