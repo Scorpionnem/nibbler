@@ -55,7 +55,7 @@ class	Server
 			char	buf[INET_ADDRSTRLEN + 1] = {};
 			inet_ntop(AF_INET, &addr.sin_addr, buf, sizeof(buf) - 1);
 
-			std::cout << "server open: " << buf << " " << port << std::endl;
+			std::cout << "server open: " << buf << " " << addr.sin_port << std::endl;
 		}
 		void	update()
 		{
