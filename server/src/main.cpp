@@ -82,6 +82,7 @@ class	Server
 				_new_connection();
 
 			i = 1;
+			std::vector<int>	disconnects;
 			for (auto& pair : _clients)
 			{
 				if (fds[i].revents & POLLIN)
@@ -98,9 +99,10 @@ class	Server
 					{
 						std::cout << "bye-bye fd: " << client.fd << std::endl;
 						close(client.fd);
+						disconnects.push_back(client.fd);
 						continue ;
 					}
-					if (size != sizeof(PacketHeader))
+					if ((size_t)size < sizeof(PacketHeader))
 					{
 						std::cerr << "invalid packet size" << std::endl;
 						continue ;
@@ -110,7 +112,11 @@ class	Server
 
 					std::cout << "Packet header: " << hdr->type << " " << hdr->size << std::endl;
 				}
+				i++;
 			}
+
+			for (int fd : disconnects)
+				_clients.erase(fd);
 		}
 	private:
 		void	_new_connection()
