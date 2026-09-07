@@ -236,8 +236,8 @@ GameState   Nibbler::_buildState() const
     tiles[_food.y * _width + _food.x] = Tile::RED_APPLE;
 
     for (size_t i = 1; i < _snake.size(); i++)
-        tiles[_snake[i].y * _width + _snake[i].x] = Tile::SNAKE_BODY;
-    tiles[_snake.front().y * _width + _snake.front().x] = Tile::SNAKE_HEAD;
+        tiles[_snake[i].y * _width + _snake[i].x] = Tile::P1_SNAKE_BODY;
+    tiles[_snake.front().y * _width + _snake.front().x] = Tile::P1_SNAKE_HEAD;
 
     return (GameState(tiles, _width, _height));
 }

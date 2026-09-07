@@ -174,7 +174,7 @@ void	CACAGraphicsDL::render(const GameState &gameState)
 
 	caca_set_color_ansi(_canvas, CACA_BLACK, CACA_BLACK);
 	caca_clear_canvas(_canvas);
-	
+
 	const std::vector<Tile>	&tiles = gameState.tiles();
 	uint32_t				width = gameState.width();
 	uint32_t				height = gameState.height();
@@ -200,7 +200,7 @@ void	CACAGraphicsDL::render(const GameState &gameState)
 		}
 		if (tiles[i] != Tile::SNAKE_BODY && tiles[i] != Tile::WALL)
 		{
-			saves.push_back({tiles[i], x, y, setupAdjacents(tiles, i, width)});
+			saves.push_back({tiles[i], {x, y}, setupAdjacents(tiles, i, width)});
 			continue;
 		}
 

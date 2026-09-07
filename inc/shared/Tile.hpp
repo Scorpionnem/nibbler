@@ -3,8 +3,10 @@
 enum class	Tile
 {
 	WALL = 'W',
-	SNAKE_HEAD = 'H',
-	SNAKE_BODY = 'S',
+	P1_SNAKE_HEAD = 'H',
+	P1_SNAKE_BODY = 'S',
+	P2_SNAKE_HEAD = 'h',
+	P2_SNAKE_BODY = 's',
 	GREEN_APPLE = 'G',
 	RED_APPLE = 'R',
 	EMPTY = '0',
