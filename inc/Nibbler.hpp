@@ -3,6 +3,7 @@
 #include <dlfcn.h>
 #include <deque>
 
+#include "shared/AudioDL.hpp"
 #include "shared/GraphicsDL.hpp"
 #include "Vec2.hpp"
 
@@ -24,6 +25,9 @@ class   Nibbler
 
         int         _loadGDL(const char *path);
         void        _unloadGDL();
+
+        int         _loadADL(const char *path);
+        void        _unloadADL();
 
         void        _reset();
         bool        _spawnFood();
@@ -47,4 +51,7 @@ class   Nibbler
 
         GraphicsDL  *_gdl = nullptr;
         void        *_gdlHandle = nullptr;
+
+        AudioDL  *_adl = nullptr;
+        void        *_adlHandle = nullptr;
 };

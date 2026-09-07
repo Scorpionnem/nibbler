@@ -136,6 +136,6 @@ void	SDLGraphicsDL::stop()
 	{
 		SDL_DestroyWindow(_window);
 		_window = nullptr;
-		SDL_Quit();
+		SDL_QuitSubSystem(SDL_INIT_VIDEO);
 	}
 }

@@ -6,11 +6,16 @@
 
 #include "Nibbler.hpp"
 
-const char *libsParhs[3] =
+const char *gdlLibsPaths[3] =
 {
     "libs/caca/nibbler_caca.so",
     "libs/sdl/nibbler_sdl.so",
     "libs/glfw/nibbler_glfw.so",
+};
+
+const char *adlLibsPaths[3] =
+{
+    "libs/sdl_audio/nibbler_sdl_audio.so",
 };
 
 int Nibbler::play(int width, int height)
@@ -18,14 +23,21 @@ int Nibbler::play(int width, int height)
     _width = width;
     _height = height;
 
-    if (_loadGDL(libsParhs[0]) == -1)
+    if (_loadGDL(gdlLibsPaths[0]) == -1)
     {
-        std::cerr << "Failed to load graphics library: " << libsParhs[0] << std::endl;
+        std::cerr << "Failed to load graphics library: " << gdlLibsPaths[0] << std::endl;
+        return (-1);
+    }
+
+    if (_loadADL(adlLibsPaths[0]) == -1)
+    {
+        std::cerr << "Failed to load audio library: " << adlLibsPaths[0] << std::endl;
         return (-1);
     }
 
     _reset();
     _gdl->open(_buildState());
+    _adl->open();
 
     _running = true;
     while (_running)
@@ -42,8 +54,8 @@ int Nibbler::play(int width, int height)
             int idx = _pendingSwitch;
             _pendingSwitch = -1;
 
-            if (_loadGDL(libsParhs[idx]) == -1)
-                std::cerr << "Failed to load graphics library: " << libsParhs[idx] << std::endl;
+            if (_loadGDL(gdlLibsPaths[idx]) == -1)
+                std::cerr << "Failed to load graphics library: " << gdlLibsPaths[idx] << std::endl;
             else
                 _gdl->open(_buildState());
         }
@@ -60,6 +72,7 @@ int Nibbler::play(int width, int height)
 
     _gdl->stop();
     _unloadGDL();
+    _unloadADL();
 
     return (0);
 }
@@ -170,6 +183,9 @@ void    Nibbler::_handleInput(GraphicsDL::Input in)
     if (opposite)
         return ;
 
+    if (_queuedDir != requested)
+    	_adl->play(AudioDL::Sound::MOVE);
+
     _queuedDir = requested;
     _turnLocked = true;
 }
@@ -211,6 +227,7 @@ bool    Nibbler::_tick()
 
     if (head == _food)
     {
+    	_adl->play(AudioDL::Sound::EAT);
         _pendingGrowth = true;
         return (_spawnFood());
     }
@@ -274,6 +291,38 @@ int    Nibbler::_loadGDL(const char *path)
     return (0);
 }
 
+int    Nibbler::_loadADL(const char *path)
+{
+    void    *newHandle = dlopen(path, RTLD_LAZY);
+    if (!newHandle)
+        return (-1);
+
+    using ADLHandlerGetter = AudioDL *(*)();
+
+    ADLHandlerGetter func = (ADLHandlerGetter)dlsym(newHandle, "getHandler");
+    if (!func)
+    {
+        dlclose(newHandle);
+        return (-1);
+    }
+
+    AudioDL  *newAdl = func();
+    if (!newAdl)
+    {
+        dlclose(newHandle);
+        return (-1);
+    }
+
+    if (_adl != nullptr)
+        _adl->stop();
+    _unloadADL();
+
+    _adl = newAdl;
+    _adlHandle = newHandle;
+
+    return (0);
+}
+
 void    Nibbler::_unloadGDL()
 {
     if (_gdl != nullptr)
@@ -286,5 +335,20 @@ void    Nibbler::_unloadGDL()
     {
         dlclose(_gdlHandle);
         _gdlHandle = nullptr;
+    }
+}
+
+void    Nibbler::_unloadADL()
+{
+    if (_adl != nullptr)
+    {
+        delete _adl;
+        _adl = nullptr;
+
+    }
+    if (_adlHandle != nullptr)
+    {
+        dlclose(_adlHandle);
+        _adlHandle = nullptr;
     }
 }
