@@ -17,15 +17,13 @@
 # include <stdbool.h>
 
 #define MAX_CLIENTS (2)
+#define MAX_CONNECTIONS (16)
+
+#include "shared/Packets.hpp"
 
 class	Server
 {
 	public:
-		struct	PacketHeader
-		{
-			uint32_t	type;
-			uint32_t	size;
-		};
 		struct	Client
 		{
 			int	fd;
@@ -49,7 +47,7 @@ class	Server
 			if (bind(_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1)
 				throw std::runtime_error("bind" + std::string(strerror(errno)));
 
-			if (listen(_fd, MAX_CLIENTS) == -1)
+			if (listen(_fd, MAX_CONNECTIONS) == -1)
 				throw std::runtime_error("listen" + std::string(strerror(errno)));
 
 			char	buf[INET_ADDRSTRLEN + 1] = {};
@@ -59,7 +57,7 @@ class	Server
 		}
 		void	update()
 		{
-			struct 	pollfd		fds[MAX_CLIENTS + 2];
+			std::vector<struct pollfd>	fds(_clients.size() + 1);
 
 			fds[0].fd = _fd;
 			fds[0].events = POLLIN;
@@ -75,7 +73,7 @@ class	Server
 				i++;
 			}
 
-			if (poll(fds, _clients.size() + 1, 250) == -1)
+			if (poll(fds.data(), _clients.size() + 1, 250) == -1)
 				throw std::runtime_error("poll" + std::string(strerror(errno)));
 
 			if ((fds[0].revents & POLLIN) != 0)
@@ -110,7 +108,7 @@ class	Server
 
 					PacketHeader	*hdr = reinterpret_cast<PacketHeader*>(buf);
 
-					std::cout << "Packet header: " << hdr->type << " " << hdr->size << std::endl;
+					std::cout << "Packet header: " << std::to_string(hdr->type) << " " << hdr->size << std::endl;
 				}
 				i++;
 			}
