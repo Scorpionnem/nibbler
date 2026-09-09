@@ -2,19 +2,17 @@
 
 #include "Nibbler.hpp"
 
-#define MIN_SIZE 10
-#define MAX_SIZE 42
-
 void    usage()
 {
-    std::cerr << "Usage:\n  ./Nibbler [width] [height]\n\n";
+    std::cerr << "Usage:\n  ./Nibbler [width] [height] <ip_port>\n\n";
     std::cerr << "min size: " << MIN_SIZE << '\n';
-    std::cerr << "max size: " << MAX_SIZE << std::endl;
+    std::cerr << "max size: " << MAX_SIZE << '\n';
+    std::cerr << "ip format: ip:port" << std::endl;
 }
 
 int main(int ac, char **av)
 {
-    if (ac != 3)
+    if (ac != 3 && ac != 4)
     {
         return (usage(), 1);
     }
@@ -29,9 +27,10 @@ int main(int ac, char **av)
 
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-    Nibbler nib;
-
-    if (nib.play(width, height) == -1)
+	Nibbler nib;
+	if (ac == 4 && nib.playOnline(width, height, av[3]) == -1)
+		return (1);
+    else if (ac == 3 && nib.play(width, height) == -1)
         return (1);
 
     return (0);

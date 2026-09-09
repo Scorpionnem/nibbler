@@ -1,5 +1,8 @@
 #pragma once
 
+#define MIN_SIZE 10
+#define MAX_SIZE 42
+
 enum class	Tile
 {
 	WALL = 'W',

@@ -259,6 +259,17 @@ GameState   Nibbler::_buildState() const
     return (GameState(tiles, _width, _height));
 }
 
+GameState   Nibbler::_buildState(const MapPacket &map) const
+{
+    std::vector<Tile>   tiles(_width * _height, Tile::EMPTY);
+
+    for (int y = 0; y < _height; y++)
+    	for (int x = 0; x < _width; x++)
+       		tiles[y * _width + x] = map.tiles[y * _width + x];
+
+    return (GameState(tiles, _width, _height));
+}
+
 int    Nibbler::_loadGDL(const char *path)
 {
     void    *newHandle = dlopen(path, RTLD_LAZY);
@@ -351,4 +362,211 @@ void    Nibbler::_unloadADL()
         dlclose(_adlHandle);
         _adlHandle = nullptr;
     }
+}
+
+
+
+int	Nibbler::playOnline(int width, int height, const std::string &port)
+{
+
+
+
+
+	_client.connect(port.substr(0, port.find(':')).c_str(), std::atoi(port.substr(port.find(':') + 1).c_str()));
+
+
+
+
+
+
+
+	_width = width;
+    _height = height;
+
+
+
+
+
+
+
+
+
+	//send map size and recv if it's correct + wait for the other player
+	MapPacket	mapInfo;
+	mapInfo.hdr.type = PacketType::MAPPACKET;
+	mapInfo.hdr.size = sizeof(MapPacket);
+	mapInfo.width = width;
+	mapInfo.height = height;
+	InputPacket	inputInfo;
+	inputInfo.hdr.type = PacketType::INPUTPACKET;
+	inputInfo.hdr.size = sizeof(InputPacket);
+	inputInfo.input = GraphicsDL::Input::NONE;
+	uint8_t	packet[MAX_PACKET_SIZE];
+	ssize_t	recvSize = -1;
+
+	_client.send((uint8_t *)&mapInfo, sizeof(mapInfo));
+
+    if (_loadGDL(gdlLibsPaths[0]) == -1)
+    {
+        std::cerr << "Failed to load graphics library: " << gdlLibsPaths[0] << std::endl;
+        return (-1);
+    }
+
+    if (_loadADL(adlLibsPaths[0]) == -1)
+    {
+        std::cerr << "Failed to load audio library: " << adlLibsPaths[0] << std::endl;
+        return (-1);
+    }
+
+    _reset();
+    _gdl->open(_buildState());
+    _adl->open();
+
+
+
+	// while (true)
+	// {
+	// 	if (_client.recv(packet, MAX_PACKET_SIZE) != -1)
+	// 	{
+	// 		PacketHeader	*hdr = reinterpret_cast<PacketHeader*>(packet);
+
+	// 		std::cout << std::to_string(hdr->type) << " " << hdr->size << std::endl;
+	// 	}
+	// }
+
+
+	bool	waitingStart = true;
+	while (waitingStart)
+	{
+		recvSize = _client.recv(packet, MAX_PACKET_SIZE);
+		PacketHeader	*hdr = reinterpret_cast<PacketHeader*>(packet);
+
+		if (recvSize != hdr->size)
+			recvSize = -1;
+		else
+		{
+			switch (hdr->type)
+			{
+				case PacketType::MAPPACKET:
+						_gdl->render(_buildState(*reinterpret_cast<MapPacket*>(packet)));
+						waitingStart = false;
+					break;
+				case PacketType::DEATHPACKET:
+					if (reinterpret_cast<DeathPacket*>(packet)->value)
+						_running = false;
+					waitingStart = false;
+					break;
+				default:
+					break;
+			}
+		}
+		for (int i = 0; i < MAX_MAP_SIZE; ++i)
+			packet[i] = 0;
+		recvSize = -1;
+	}
+	for (int i = 0; i < MAX_MAP_SIZE; ++i)
+		packet[i] = 0;
+	recvSize = -1;
+
+
+	// while (_client.recv((uint8_t *)&mapInfo, sizeof(mapInfo)) == sizeof(mapInfo))
+	// 	usleep(1000);
+
+
+	// _gdl->render(_buildState(mapInfo));
+
+
+
+
+
+
+
+
+
+    _running = true;
+    while (_running)
+    {
+        do
+        {
+			inputInfo.input = _gdl->getInput();
+
+			switch (inputInfo.input)
+			{
+				case GraphicsDL::Input::SWITCH1:
+					_pendingSwitch = 0;
+					break;
+				case GraphicsDL::Input::SWITCH2:
+					_pendingSwitch = 1;
+					break;
+				case GraphicsDL::Input::SWITCH3:
+					_pendingSwitch = 2;
+					break;
+				case GraphicsDL::Input::CLOSE:
+					_running = false;
+					break;
+				case GraphicsDL::Input::NONE:
+					break;
+				default:
+					_client.send((uint8_t *)&inputInfo, sizeof(inputInfo));
+			}
+        } while (inputInfo.input != GraphicsDL::Input::NONE);
+
+        if (_pendingSwitch != -1)
+        {
+            int idx = _pendingSwitch;
+            _pendingSwitch = -1;
+
+            if (_loadGDL(gdlLibsPaths[idx]) == -1)
+                std::cerr << "Failed to load graphics library: " << gdlLibsPaths[idx] << std::endl;
+            else
+                _gdl->open(_buildState(mapInfo));
+        }
+
+        // if (!_tick()) 					// this will now be handled by the server
+        //     break ;
+
+
+
+
+
+
+
+		// _gdl->render(_buildState()); 	//need to recv board data from server
+
+		recvSize = _client.recv(packet, MAX_PACKET_SIZE);
+		PacketHeader	*hdr = reinterpret_cast<PacketHeader*>(packet);
+
+		if (recvSize != -1 && recvSize != hdr->size)
+			recvSize = -1;
+		else if (recvSize != -1)
+		{
+			std::cout << std::to_string(hdr->type) << " " << hdr->size << std::endl;
+			switch (hdr->type)
+			{
+				case PacketType::MAPPACKET:
+						_gdl->render(_buildState(*reinterpret_cast<MapPacket*>(packet)));
+					break;
+				case PacketType::DEATHPACKET:
+					if (reinterpret_cast<DeathPacket*>(packet)->value)
+						_running = false;
+					break;
+				case PacketType::SOUNDPACKET:
+					_adl->play(reinterpret_cast<PlaySound*>(packet)->sound);
+				default:
+					break;
+			}
+		}
+		for (int i = 0; i < MAX_MAP_SIZE; ++i)
+			packet[i] = 0;
+		recvSize = -1;
+
+        if (_running)
+            usleep(1000); 
+    }
+
+    _gdl->stop();
+    _unloadGDL();
+    _unloadADL();
+
+    return (0);
 }
