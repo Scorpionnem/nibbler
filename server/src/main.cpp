@@ -124,7 +124,10 @@ class	Server
 				throw std::runtime_error("poll" + std::string(strerror(errno)));
 
 			if ((fds[0].revents & POLLIN) != 0)
+			{
 				_new_connection();
+				return ;
+			}
 
 			i = 1;
 			std::vector<int>	disconnects;
@@ -166,9 +169,12 @@ class	Server
 							MapPacket	*mapInfo = reinterpret_cast<MapPacket*>(buf);
 							if (_clients.size() == 2)
 							{
-								if ((uint32_t)_width != mapInfo->width || (uint32_t)_height != mapInfo->height)		
+								if ((uint32_t)_width != mapInfo->width || (uint32_t)_height != mapInfo->height)
+								{
 									for (auto& pair : _clients)
 										_sendDeath(pair.second.fd);
+									reset();
+								}
 								else
 									for (auto& pair : _clients)
 										_sendMap(pair.second.fd);
@@ -199,27 +205,29 @@ class	Server
 
 		void	tick()
 		{
+			Vec2i	heads[2] = {_snakes[0].front(), _snakes[1].front()};
 			for (int player = 0; player < MAX_CLIENTS; ++player)
 			{
 				_dirs[player] = _queuedDirs[player];
 				_turnLocks[player] = false;
 
-				Vec2i   head = _snakes[player].front();
 				switch (_dirs[player])
 				{
 					case Direction::UP:
-						head.y -= 1; break ;
+						heads[player].y -= 1; break ;
 					case Direction::DOWN:
-						head.y += 1; break ;
+						heads[player].y += 1; break ;
 					case Direction::LEFT:
-						head.x -= 1; break ;
+						heads[player].x -= 1; break ;
 					case Direction::RIGHT:
-						head.x += 1; break ;
+						heads[player].x += 1; break ;
 				}
 
-				if (head.x <= 0 || head.x >= _width - 1 || head.y <= 0 || head.y >= _height - 1)
+				if (heads[player].x <= 0 || heads[player].x >= _width - 1 || heads[player].y <= 0 || heads[player].y >= _height - 1)
 				{
-					_sendDeath(_players[player]);
+					_sendDeath(_players[0]);
+					_sendDeath(_players[1]);
+					reset();
 					return;
 				}
 
@@ -227,14 +235,16 @@ class	Server
 				{
 					if (!_pendingGrowths[player] && i == _snakes[player].size() - 1)
 						continue ;
-					if (_snakes[player][i] == head)
+					if (_snakes[player][i] == heads[0] || _snakes[player][i] == heads[1])
 					{
-						_sendDeath(_players[player]);
+						_sendDeath(_players[0]);
+						_sendDeath(_players[1]);
+						reset();
 						return;
 					}
 				}
 
-				_snakes[player].push_front(head);
+				_snakes[player].push_front(heads[player]);
 				if (_pendingGrowths[player])
 					_pendingGrowths[player] = false;
 				else
@@ -246,11 +256,15 @@ class	Server
 					_snakes[player].pop_back();
 				}
 				if (_snakes[player].size() <= 1)
-					_sendDeath(_players[player]);
+				{
+					_sendDeath(_players[0]);
+					_sendDeath(_players[1]);
+					reset();
+				}
 
 				for (int i = 0; i < (int)_foods.size(); ++i)
 				{
-					if (head == _foods[i].second)
+					if (heads[player] == _foods[i].second)
 					{
 						if (_foods[i].first == Tile::RED_APPLE)
 							_pendingGrowths[player] = true;
@@ -348,6 +362,7 @@ class	Server
 
 			_sendPacket(fd, (uint8_t *)&death, sizeof(death));
 			close(fd);
+			_clients.erase(fd);
 		}
 		
 		void	_sendMap(const int &fd)
@@ -514,14 +529,13 @@ int	main(int ac, char **av)
 	{
 		server.update();
 		// std::cout << server.getNbClients() << std::endl;
-		if (server.getNbClients() == MAX_CLIENTS && chrono.get() >= 0.1)
+		if (server.getNbClients() == MAX_CLIENTS && chrono.get() >= 0.2)
 		{
 			if (isFirst)
 			{
 				server.reset();
 				isFirst = false;
 			}
-			std::cout << "tick" << std::endl;
 			server.tick();
 			chrono.start();
 		}

@@ -6,7 +6,7 @@
 /*   By: mbirou <mbirou@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/26 10:05:00 by mbirou            #+#    #+#             */
-/*   Updated: 2026/08/30 18:00:45 by mbirou           ###   ########.fr       */
+/*   Updated: 2026/09/09 18:25:55 by mbirou           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,12 @@ void	setColor(caca_canvas_t *canvas, Tile tile)
 			break;
 		case Tile::P1_SNAKE_BODY:
 			caca_set_color_ansi(canvas, CACA_LIGHTGREEN, CACA_BLACK);
+			break;
+		case Tile::P2_SNAKE_HEAD:
+			caca_set_color_ansi(canvas, CACA_LIGHTCYAN, CACA_BLACK);
+			break;
+		case Tile::P2_SNAKE_BODY:
+			caca_set_color_ansi(canvas, CACA_LIGHTBLUE, CACA_BLACK);
 			break;
 		case Tile::GREEN_APPLE:
 			caca_set_color_ansi(canvas, CACA_YELLOW, CACA_BLACK);
@@ -180,8 +186,7 @@ void	CACAGraphicsDL::render(const GameState &gameState)
 	uint32_t				height = gameState.height();
 	Edges					edges;
 
-	TileSave				head;
-	std::vector<TileSave>	saves;
+	std::deque<TileSave>	saves;
 
 	for (size_t i = 0; i < tiles.size(); i++)
 	{
@@ -190,22 +195,19 @@ void	CACAGraphicsDL::render(const GameState &gameState)
 
 		if (tiles[i] == Tile::EMPTY)
 			continue ;
-		if (tiles[i] == Tile::P1_SNAKE_HEAD)
+		if (tiles[i] == Tile::P1_SNAKE_HEAD || tiles[i] == Tile::P2_SNAKE_HEAD)
 		{
-			head.pos[0] = x;
-			head.pos[1] = y;
-			head.edges = setupAdjacents(tiles, i, width);
-			head.tile = tiles[i];
+			saves.push_front({tiles[i], {x, y}, setupAdjacents(tiles, i, width)});
 			continue;
 		}
-		if (tiles[i] != Tile::P1_SNAKE_BODY && tiles[i] != Tile::WALL)
+		if (tiles[i] != Tile::P1_SNAKE_BODY && tiles[i] != Tile::P2_SNAKE_BODY && tiles[i] != Tile::WALL)
 		{
 			saves.push_back({tiles[i], {x, y}, setupAdjacents(tiles, i, width)});
 			continue;
 		}
 
 		setColor(_canvas, tiles[i]);
-		if (tiles[i] == Tile::P1_SNAKE_BODY)
+		if (tiles[i] == Tile::P1_SNAKE_BODY || tiles[i] == Tile::P2_SNAKE_BODY)
 		{
 			edges = setupAdjacents(tiles, i, width);
 			placeSquare(_canvas, x, y, edges);
@@ -213,8 +215,6 @@ void	CACAGraphicsDL::render(const GameState &gameState)
 		else
 			placeLine(_canvas, x, y, width, height);
 	}
-	setColor(_canvas, Tile::P1_SNAKE_HEAD);
-	placeSquare(_canvas, head.pos[0], head.pos[1], head.edges);
 
 	for (auto save : saves)
 	{

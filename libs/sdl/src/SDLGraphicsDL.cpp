@@ -34,6 +34,12 @@ static void	setColor(SDL_Renderer *renderer, Tile tile)
 		case Tile::P1_SNAKE_BODY:
 			SDL_SetRenderDrawColor(renderer, 0, 200, 0, 255);
 			break;
+		case Tile::P2_SNAKE_HEAD:
+			SDL_SetRenderDrawColor(renderer, 0, 0, 150, 255);
+			break;
+		case Tile::P2_SNAKE_BODY:
+			SDL_SetRenderDrawColor(renderer, 0, 0, 200, 255);
+			break;
 		case Tile::GREEN_APPLE:
 			SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 			break;

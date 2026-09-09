@@ -438,11 +438,22 @@ int	Nibbler::playOnline(int width, int height, const std::string &port)
 	bool	waitingStart = true;
 	while (waitingStart)
 	{
+		if (_gdl->getInput() == GraphicsDL::Input::CLOSE)
+		{
+			_running = false;
+			break;
+		}
+
 		recvSize = _client.recv(packet, MAX_PACKET_SIZE);
 		PacketHeader	*hdr = reinterpret_cast<PacketHeader*>(packet);
 
 		if (recvSize != hdr->size)
 			recvSize = -1;
+		else if (recvSize == 0)
+		{
+			_running = false;
+			break;
+		}
 		else
 		{
 			switch (hdr->type)
@@ -538,9 +549,11 @@ int	Nibbler::playOnline(int width, int height, const std::string &port)
 
 		if (recvSize != -1 && recvSize != hdr->size)
 			recvSize = -1;
+		else if (recvSize == 0)
+			break;
 		else if (recvSize != -1)
 		{
-			std::cout << std::to_string(hdr->type) << " " << hdr->size << std::endl;
+			// std::cout << std::to_string(hdr->type) << " " << hdr->size << std::endl;
 			switch (hdr->type)
 			{
 				case PacketType::MAPPACKET:
@@ -561,7 +574,7 @@ int	Nibbler::playOnline(int width, int height, const std::string &port)
 		recvSize = -1;
 
         if (_running)
-            usleep(1000); 
+            usleep(10000); 
     }
 
     _gdl->stop();
