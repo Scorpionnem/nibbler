@@ -10,7 +10,7 @@ const char *gdlLibsPaths[3] =
 {
     "libs/caca/nibbler_caca.so",
     "libs/sdl/nibbler_sdl.so",
-    "libs/glfw/nibbler_glfw.so",
+    "libs/mbatty/mbattylib.so",
 };
 
 const char *adlLibsPaths[3] =
@@ -574,7 +574,7 @@ int	Nibbler::playOnline(int width, int height, const std::string &port)
 		recvSize = -1;
 
         if (_running)
-            usleep(10000); 
+            usleep(10000);
     }
 
     _gdl->stop();

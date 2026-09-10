@@ -1,0 +1,6 @@
+lib/math
+lib/stb_image
+.obj/
+ft_minecraft
+compile_commands.json
+assets/textures/test

@@ -3,3 +3,6 @@
 *.d
 .obj/
 Nibbler
+Nibbler_server
+compile_commands.json
+a.out
