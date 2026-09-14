@@ -10,8 +10,8 @@ INC_DIR :=		inc/
 SRC_DIR :=		src/
 OBJ_DIR :=		.obj/
 
-CACA_LIBS :=	`pkg-config --libs caca`
-# CACA_LIBS :=	-Llib -lcaca
+# CACA_LIBS :=	`pkg-config --libs caca`
+CACA_LIBS :=	-Llib -lcaca
 
 INCLUDE_DIRS :=	-I$(INC_DIR) -I$(SHARED_INC)
 LFLAGS :=		$(CACA_LIBS)

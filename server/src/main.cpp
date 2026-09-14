@@ -75,6 +75,10 @@ class	Server
 		{
 			int	fd;
 		};
+		void	enableWalls()
+		{
+			_addWalls = true;
+		}
 		void	open(int port)
 		{
 			struct sockaddr_in	addr;
@@ -137,17 +141,20 @@ class	Server
 				{
 					Client	&client = pair.second;
 
-					uint8_t	buf[4096] = {};
+					uint8_t	buf[MAX_PACKET_SIZE] = {};
 					ssize_t size = 0;
 
 					size = recv(client.fd, buf, sizeof(buf), 0);
-					// std::cout << "recv fd: " << client.fd << std::endl;
+					std::cout << "recv fd: " << client.fd << std::endl;
 
 					if (size == 0 || size == -1)
 					{
-						// std::cout << "bye-bye fd: " << client.fd << std::endl;
+						std::cout << "bye-bye fd: " << client.fd << std::endl;
 						close(client.fd);
 						disconnects.push_back(client.fd);
+						for (auto& pair : _clients)
+							_sendDeath(pair.second.fd);
+						reset();
 						continue ;
 					}
 					if ((size_t)size < sizeof(PacketHeader))
@@ -160,41 +167,48 @@ class	Server
 
 					std::cout << "Packet header: " << std::to_string(hdr->type) << " " << hdr->size << std::endl;
 
-					switch (hdr->type)
+
+					if (size == hdr->size)
 					{
-						case PacketType::CONNECTION:
-							break;
-						case PacketType::MAPPACKET:
+						switch (hdr->type)
 						{
-							MapPacket	*mapInfo = reinterpret_cast<MapPacket*>(buf);
-							if (_clients.size() == 2)
+							case PacketType::CONNECTION:
+								break;
+							case PacketType::MAPPACKET:
 							{
-								if ((uint32_t)_width != mapInfo->width || (uint32_t)_height != mapInfo->height)
+								MapPacket	*mapInfo = reinterpret_cast<MapPacket*>(buf);
+								if (_clients.size() == 2)
 								{
-									for (auto& pair : _clients)
-										_sendDeath(pair.second.fd);
+									if ((uint32_t)_width != mapInfo->width || (uint32_t)_height != mapInfo->height)
+									{
+										for (auto& pair : _clients)
+										{
+											_sendDeath(pair.second.fd);
+											disconnects.push_back(pair.second.fd);
+										}
+										reset();
+										break;
+									}
+									else
+										for (auto& pair : _clients)
+											_sendMap(pair.second.fd);
+									break;
+								}
+								if (_clients.size() == 1)
+								{
+									_width = mapInfo->width;
+									_height = mapInfo->height;
 									reset();
 								}
-								else
-									for (auto& pair : _clients)
-										_sendMap(pair.second.fd);
 								break;
 							}
-
-							if (_width == 0)
-								_width = mapInfo->width;
-							if (_height == 0)
-								_height = mapInfo->height;
-							break;
+							case PacketType::INPUTPACKET:
+								_handleInput(client.fd, reinterpret_cast<InputPacket*>(buf)->input);
+								break;
+							default:
+								break;
 						}
-						case PacketType::INPUTPACKET:
-							_handleInput(client.fd, reinterpret_cast<InputPacket*>(buf)->input);
-							break;
-						default:
-							break;
 					}
-
-
 				}
 				i++;
 			}
@@ -206,6 +220,7 @@ class	Server
 		void	tick()
 		{
 			Vec2i	heads[2] = {_snakes[0].front(), _snakes[1].front()};
+
 			for (int player = 0; player < MAX_CLIENTS; ++player)
 			{
 				_dirs[player] = _queuedDirs[player];
@@ -223,10 +238,23 @@ class	Server
 						heads[player].x += 1; break ;
 				}
 
+				for (auto wall : _walls)
+				{
+					if (wall == heads[player])
+					{
+						_sendDeath(_players[player], true);
+						_sendDeath(_players[1 - player]);
+						_clients.clear();
+						reset();
+						return;
+					}
+				}
+
 				if (heads[player].x <= 0 || heads[player].x >= _width - 1 || heads[player].y <= 0 || heads[player].y >= _height - 1)
 				{
-					_sendDeath(_players[0]);
-					_sendDeath(_players[1]);
+					_sendDeath(_players[player], true);
+					_sendDeath(_players[1 - player]);
+					_clients.clear();
 					reset();
 					return;
 				}
@@ -237,8 +265,17 @@ class	Server
 						continue ;
 					if (_snakes[player][i] == heads[0] || _snakes[player][i] == heads[1])
 					{
-						_sendDeath(_players[0]);
-						_sendDeath(_players[1]);
+						if (_snakes[player][i] == heads[player])
+						{
+							_sendDeath(_players[player], true);
+							_sendDeath(_players[1 - player]);
+						}
+						else
+						{
+							_sendDeath(_players[1 - player], true);
+							_sendDeath(_players[player]);
+						}
+						_clients.clear();
 						reset();
 						return;
 					}
@@ -257,8 +294,9 @@ class	Server
 				}
 				if (_snakes[player].size() <= 1)
 				{
-					_sendDeath(_players[0]);
-					_sendDeath(_players[1]);
+					_sendDeath(_players[player], true);
+					_sendDeath(_players[1 - player]);
+					_clients.clear();
 					reset();
 				}
 
@@ -269,7 +307,7 @@ class	Server
 						if (_foods[i].first == Tile::RED_APPLE)
 							_pendingGrowths[player] = true;
 						else if (_foods[i].first == Tile::GREEN_APPLE)
-							_pendingShrinks[player] = true;
+							_pendingShrinks[1 - player] = true;
 						_spawnFood(_foods[i].first);
 						_foods.erase(_foods.begin() + i);
 						break;
@@ -317,6 +355,59 @@ class	Server
 			_foods.clear();
 			_spawnFood(Tile::GREEN_APPLE);
 			_spawnFood(Tile::RED_APPLE);
+
+			if (_addWalls)
+			{
+				do
+				{
+					_walls.clear();
+
+					int	nbWalls = float(rand()) / float(RAND_MAX) * (std::min(_width, _height) / 2.f) + (std::min(_width, _height) / 2.f);
+
+					for (int i = 0; i < nbWalls; ++i)
+					{
+						Vec2i	tryPos;
+						bool isGood = true;
+						do
+						{
+							isGood = true;
+							tryPos = {int(float(rand()) / float(RAND_MAX) * (_width - 2.) + 1), int(float(rand()) / float(RAND_MAX) * (_height - 2.) + 1)};
+
+							for (auto food : _foods)
+							{
+								if (food.second == tryPos)
+								{
+									isGood = false;
+									break ;
+								}
+							}
+
+							for (int i = 0; i < MAX_CLIENTS && isGood; ++i)
+							{
+								for (const Vec2i &seg : _snakes[i])
+								{
+									if (seg == tryPos)
+									{
+										isGood = false;
+										break ;
+									}
+								}
+							}
+							for (auto wall : _walls)
+							{
+								if (wall == tryPos)
+								{
+									isGood = false;
+									break ;
+								}
+							}
+						} while (!isGood);
+						
+						_walls.push_back(tryPos);
+					}
+
+				} while (!_isMapValid());
+			}
 		}
 
 	private:
@@ -345,27 +436,24 @@ class	Server
 			
 		}
 
-		
-
 		void	_sendPacket(const int &fd, const uint8_t *data, const uint64_t &size)
 		{
 			::send(fd, data, size, MSG_DONTWAIT);
 		}
 		
-		void	_sendDeath(const int &fd)
+		void	_sendDeath(const int &fd, const bool lost = false)
 		{
 			DeathPacket	death;
 
 			death.hdr.type = PacketType::DEATHPACKET;
 			death.hdr.size = sizeof(DeathPacket);
-			death.value = true;
+			death.value = lost;
 
 			_sendPacket(fd, (uint8_t *)&death, sizeof(death));
 			close(fd);
-			_clients.erase(fd);
 		}
-		
-		void	_sendMap(const int &fd)
+
+		MapPacket	makeMap(void)
 		{
 			MapPacket	map;
 
@@ -408,7 +496,17 @@ class	Server
 					map.tiles[_snakes[1].front().y * _width + _snakes[1].front().x] = Tile::P2_SNAKE_HEAD;
 			}
 
-			_sendPacket(fd, (uint8_t*)&map, sizeof(map));
+			for (auto wall : _walls)
+				map.tiles[wall.y * _width + wall.x] = Tile::WALL;
+
+			return (map);
+		}
+		
+		void	_sendMap(const int &fd)
+		{
+			MapPacket	map = makeMap();
+
+			_sendPacket(fd, (uint8_t*)&map, sizeof(MapPacket));
 		}
 
 		void	_handleInput(const int &fd, const GraphicsDL::Input &input)
@@ -484,6 +582,35 @@ class	Server
 			return (true);
 		}
 
+		void	floodFill(Tile	*tiles, const int &x, const int &y, const int &width)
+		{
+			if (tiles[y * width + x] == Tile::WALL || tiles[y * width + x] == Tile::NONE)
+				return ;
+
+			tiles[y * width + x] = Tile::NONE;
+			floodFill(tiles, x + 1, y, width);
+			floodFill(tiles, x - 1, y, width);
+			floodFill(tiles, x, y + 1, width);
+			floodFill(tiles, x, y - 1, width);
+		}
+
+		bool	_isMapValid()
+		{
+			MapPacket	map = makeMap();
+			Tile	*tiles = map.tiles;
+
+			floodFill(tiles, _snakes[0].front().x, _snakes[0].front().y, _width);
+
+			for (int y = 0; y < _height; ++y)
+			{
+				for (int x = 0; x < _width; ++x)
+				{
+					if (tiles[y * _width + x] != Tile::WALL && tiles[y * _width + x] != Tile::NONE)
+						return (false);
+				}
+			}
+			return (true);
+		}
 
 	private:
 		int						_fd;
@@ -508,27 +635,38 @@ class	Server
 		bool								_pendingGrowths[2] = {false, false};
 		bool								_pendingShrinks[2] = {false, false};
 		bool								_turnLocks[2] = {false, false};
+		bool								_addWalls;
+		std::vector<Vec2i>					_walls;
 };
 
 int	main(int ac, char **av)
 {
-	if (ac != 2)
+	if (ac != 2 && ac != 3)
 	{
-		std::cerr << "Usage: ./server <port>" << std::endl;
+		std::cerr << "Usage: ./server <port> <flag>" << std::endl;
+		std::cerr << "flag: -w [Enable Walls]" << std::endl;
 		return (1);
 	}
 
 	Server	server;
 	Chrono	chrono;
 
-	server.open(std::atoi(av[1]));
+	if (ac == 3 && std::string(av[2]) != "-w")
+	{
+		std::cerr << "flag is invalid: the only flag is '-w'" << std::endl;
+		return (1);
+	}
+	else if (ac == 3)
+		server.enableWalls();
 
+	server.open(std::atoi(av[1]));
+	
 	bool	isFirst = true;
 	chrono.start();
 	while (1)
 	{
 		server.update();
-		// std::cout << server.getNbClients() << std::endl;
+
 		if (server.getNbClients() == MAX_CLIENTS && chrono.get() >= 0.2)
 		{
 			if (isFirst)

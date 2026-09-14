@@ -18,10 +18,11 @@ const char *adlLibsPaths[3] =
     "libs/sdl_audio/nibbler_sdl_audio.so",
 };
 
-int Nibbler::play(int width, int height)
+int Nibbler::play(int width, int height, bool addWalls)
 {
     _width = width;
     _height = height;
+	_addWalls = addWalls;
 
     if (_loadGDL(gdlLibsPaths[0]) == -1)
     {
@@ -77,6 +78,36 @@ int Nibbler::play(int width, int height)
     return (0);
 }
 
+void	floodFill(std::vector<Tile> &tiles, const int &x, const int &y, const int &width)
+{
+	if (tiles[y * width + x] == Tile::WALL || tiles[y * width + x] == Tile::NONE)
+		return ;
+
+	tiles[y * width + x] = Tile::NONE;
+	floodFill(tiles, x + 1, y, width);
+	floodFill(tiles, x - 1, y, width);
+	floodFill(tiles, x, y + 1, width);
+	floodFill(tiles, x, y - 1, width);
+}
+
+bool	Nibbler::_isMapValid()
+{
+	std::vector<Tile>	tiles = _buildState().tiles();
+
+	floodFill(tiles, _snake.front().x, _snake.front().y, _width);
+
+	for (int y = 0; y < _height; ++y)
+	{
+		for (int x = 0; x < _width; ++x)
+		{
+			if (tiles[y * _width + x] != Tile::WALL && tiles[y * _width + x] != Tile::NONE)
+				return (false);
+		}
+	}
+
+	return (true);
+}
+
 void    Nibbler::_reset()
 {
     _snake.clear();
@@ -95,6 +126,50 @@ void    Nibbler::_reset()
     _pendingGrowth = false;
 
     _spawnFood();
+
+	if (_addWalls)
+	{
+		do
+		{
+			_walls.clear();
+
+			int	nbWalls = float(rand()) / float(RAND_MAX) * (std::min(_width, _height) / 2.f) + (std::min(_width, _height) / 2.f);
+
+			for (int i = 0; i < nbWalls; ++i)
+			{
+				Vec2i	tryPos;
+				bool isGood = true;
+				do
+				{
+					isGood = true;
+					tryPos = {int(float(rand()) / float(RAND_MAX) * (_width - 2.) + 1), int(float(rand()) / float(RAND_MAX) * (_height - 2.) + 1)};
+
+					if (tryPos == _food)
+						continue;
+
+					for (const Vec2i &seg : _snake)
+					{
+						if (seg == tryPos)
+						{
+							isGood = false;
+							break ;
+						}
+					}
+					for (auto wall : _walls)
+					{
+						if (wall == tryPos)
+						{
+							isGood = false;
+							break ;
+						}
+					}
+				} while (!isGood);
+				
+				_walls.push_back(tryPos);
+			}
+
+		} while (!_isMapValid());
+	}
 }
 
 bool    Nibbler::_spawnFood()
@@ -115,6 +190,14 @@ bool    Nibbler::_spawnFood()
                     break ;
                 }
             }
+			for (auto wall : _walls)
+			{
+				if (wall == pos)
+                {
+                    onSnake = true;
+                    break ;
+                }
+			}
 
             if (!onSnake)
                 possiblePos.push_back(pos);
@@ -209,7 +292,13 @@ bool    Nibbler::_tick()
     }
 
     if (head.x <= 0 || head.x >= _width - 1 || head.y <= 0 || head.y >= _height - 1)
+	{
         return (false);
+	}
+
+	for (auto wall : _walls)
+		if (head == wall)
+			return (false);
 
     for (size_t i = 0; i < _snake.size(); i++)
     {
@@ -255,6 +344,9 @@ GameState   Nibbler::_buildState() const
     for (size_t i = 1; i < _snake.size(); i++)
         tiles[_snake[i].y * _width + _snake[i].x] = Tile::P1_SNAKE_BODY;
     tiles[_snake.front().y * _width + _snake.front().x] = Tile::P1_SNAKE_HEAD;
+
+	for (auto wall : _walls)
+		tiles[wall.y * _width + wall.x] = Tile::WALL;
 
     return (GameState(tiles, _width, _height));
 }
@@ -364,34 +456,13 @@ void    Nibbler::_unloadADL()
     }
 }
 
-
-
 int	Nibbler::playOnline(int width, int height, const std::string &port)
 {
-
-
-
-
 	_client.connect(port.substr(0, port.find(':')).c_str(), std::atoi(port.substr(port.find(':') + 1).c_str()));
-
-
-
-
-
-
 
 	_width = width;
     _height = height;
 
-
-
-
-
-
-
-
-
-	//send map size and recv if it's correct + wait for the other player
 	MapPacket	mapInfo;
 	mapInfo.hdr.type = PacketType::MAPPACKET;
 	mapInfo.hdr.size = sizeof(MapPacket);
@@ -422,19 +493,6 @@ int	Nibbler::playOnline(int width, int height, const std::string &port)
     _gdl->open(_buildState());
     _adl->open();
 
-
-
-	// while (true)
-	// {
-	// 	if (_client.recv(packet, MAX_PACKET_SIZE) != -1)
-	// 	{
-	// 		PacketHeader	*hdr = reinterpret_cast<PacketHeader*>(packet);
-
-	// 		std::cout << std::to_string(hdr->type) << " " << hdr->size << std::endl;
-	// 	}
-	// }
-
-
 	bool	waitingStart = true;
 	while (waitingStart)
 	{
@@ -463,8 +521,7 @@ int	Nibbler::playOnline(int width, int height, const std::string &port)
 						waitingStart = false;
 					break;
 				case PacketType::DEATHPACKET:
-					if (reinterpret_cast<DeathPacket*>(packet)->value)
-						_running = false;
+					_running = false;
 					waitingStart = false;
 					break;
 				default:
@@ -479,22 +536,7 @@ int	Nibbler::playOnline(int width, int height, const std::string &port)
 		packet[i] = 0;
 	recvSize = -1;
 
-
-	// while (_client.recv((uint8_t *)&mapInfo, sizeof(mapInfo)) == sizeof(mapInfo))
-	// 	usleep(1000);
-
-
-	// _gdl->render(_buildState(mapInfo));
-
-
-
-
-
-
-
-
-
-    _running = true;
+	_running = true;
     while (_running)
     {
         do
@@ -533,17 +575,6 @@ int	Nibbler::playOnline(int width, int height, const std::string &port)
                 _gdl->open(_buildState(mapInfo));
         }
 
-        // if (!_tick()) 					// this will now be handled by the server
-        //     break ;
-
-
-
-
-
-
-
-		// _gdl->render(_buildState()); 	//need to recv board data from server
-
 		recvSize = _client.recv(packet, MAX_PACKET_SIZE);
 		PacketHeader	*hdr = reinterpret_cast<PacketHeader*>(packet);
 
@@ -553,7 +584,6 @@ int	Nibbler::playOnline(int width, int height, const std::string &port)
 			break;
 		else if (recvSize != -1)
 		{
-			// std::cout << std::to_string(hdr->type) << " " << hdr->size << std::endl;
 			switch (hdr->type)
 			{
 				case PacketType::MAPPACKET:
@@ -561,7 +591,10 @@ int	Nibbler::playOnline(int width, int height, const std::string &port)
 					break;
 				case PacketType::DEATHPACKET:
 					if (reinterpret_cast<DeathPacket*>(packet)->value)
-						_running = false;
+						std::cout << "You Lost 🤣🫵" << std::endl;
+					else
+						std::cout << "You Won 😎🤏" << std::endl;
+					_running = false;
 					break;
 				case PacketType::SOUNDPACKET:
 					_adl->play(reinterpret_cast<PlaySound*>(packet)->sound);
@@ -583,3 +616,5 @@ int	Nibbler::playOnline(int width, int height, const std::string &port)
 
     return (0);
 }
+
+// you-pi

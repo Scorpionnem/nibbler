@@ -6,7 +6,7 @@
 /*   By: mbirou <mbirou@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/26 10:05:00 by mbirou            #+#    #+#             */
-/*   Updated: 2026/09/09 18:25:55 by mbirou           ###   ########.fr       */
+/*   Updated: 2026/09/13 13:17:14 by mbirou           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,7 @@ void	placeSquare(caca_canvas_t *canvas, const int &x, const int &y, const Edges 
 void	placeLine(caca_canvas_t *canvas, const int &x, const int &y, const int &width, const int &height)
 {
 	std::string ch = " ";
-	if (x == 0 || x == height - 1)
+	if (x == 0 || x == width - 1)
 	{
 		for (int yi = 0; yi < TILE_SIZE; ++yi)
 		{
@@ -147,7 +147,7 @@ void	placeLine(caca_canvas_t *canvas, const int &x, const int &y, const int &wid
 			caca_put_str(canvas, x * (TILE_SIZE) + ((x == width - 1) * (TILE_SIZE * 2 - 2)), yi + y, ch.c_str());
 		}
 	}
-	else
+	else if (y == 0 || y == height - 1)
 	{
 		for (int xi = 0; xi < TILE_SIZE * 2 - 1; ++xi)
 		{
@@ -155,20 +155,41 @@ void	placeLine(caca_canvas_t *canvas, const int &x, const int &y, const int &wid
 			caca_put_str(canvas, xi + x * (TILE_SIZE), y + ((y == height - 1) * (TILE_SIZE - 1)), ch.c_str());
 		}
 	}
+	else
+	{
+		for (int yi = 0; yi < TILE_SIZE; ++yi)
+		{
+			for (int xi = 0; xi < TILE_SIZE * 2 - 1; ++xi)
+			{
+				if (yi == 0 && xi == 0)
+					caca_put_str(canvas, xi + x * (TILE_SIZE), yi + y, "┏");
+				else if (yi == 0 && xi == TILE_SIZE * 2 - 2)
+					caca_put_str(canvas, xi + x * (TILE_SIZE), yi + y, "┓");
+				else if (yi == TILE_SIZE - 1 && xi == 0)
+					caca_put_str(canvas, xi + x * (TILE_SIZE), yi + y, "┗");
+				else if (yi == TILE_SIZE - 1 && xi == TILE_SIZE * 2 - 2)
+					caca_put_str(canvas, xi + x * (TILE_SIZE), yi + y, "┛");
+				else if (xi == 0 || xi == TILE_SIZE * 2 - 2)
+					caca_put_str(canvas, xi + x * (TILE_SIZE), yi + y, "┃");
+				else if (yi == 0 || yi == TILE_SIZE - 2)
+					caca_put_str(canvas, xi + x * (TILE_SIZE), yi + y, "━");
+			}
+		}
+	}
 }
 
-Edges	setupAdjacents(const std::vector<Tile> &tiles, const int &i,const int &width)
+Edges	setupAdjacents(const std::vector<Tile> &tiles, const int &i,const int &width, const Tile &extraCheck)
 {
 	Edges	edges;
 
-	edges.W		= tiles[i - 1]			!= Tile::EMPTY && tiles[i - 1]			!= Tile::WALL;
-	edges.NW	= tiles[i - width - 1]	!= Tile::EMPTY && tiles[i - width - 1]	!= Tile::WALL;
-	edges.N		= tiles[i - width]		!= Tile::EMPTY && tiles[i - width]		!= Tile::WALL;
-	edges.NE	= tiles[i - width + 1]	!= Tile::EMPTY && tiles[i - width + 1]	!= Tile::WALL;
-	edges.E		= tiles[i + 1]			!= Tile::EMPTY && tiles[i + 1]			!= Tile::WALL;
-	edges.SE	= tiles[i + width + 1]	!= Tile::EMPTY && tiles[i + width + 1]	!= Tile::WALL;
-	edges.S		= tiles[i + width]		!= Tile::EMPTY && tiles[i + width]		!= Tile::WALL;
-	edges.SW	= tiles[i + width - 1]	!= Tile::EMPTY && tiles[i + width - 1]	!= Tile::WALL;
+	edges.W		= tiles[i - 1]			!= Tile::EMPTY && tiles[i - 1]			!= extraCheck;
+	edges.NW	= tiles[i - width - 1]	!= Tile::EMPTY && tiles[i - width - 1]	!= extraCheck;
+	edges.N		= tiles[i - width]		!= Tile::EMPTY && tiles[i - width]		!= extraCheck;
+	edges.NE	= tiles[i - width + 1]	!= Tile::EMPTY && tiles[i - width + 1]	!= extraCheck;
+	edges.E		= tiles[i + 1]			!= Tile::EMPTY && tiles[i + 1]			!= extraCheck;
+	edges.SE	= tiles[i + width + 1]	!= Tile::EMPTY && tiles[i + width + 1]	!= extraCheck;
+	edges.S		= tiles[i + width]		!= Tile::EMPTY && tiles[i + width]		!= extraCheck;
+	edges.SW	= tiles[i + width - 1]	!= Tile::EMPTY && tiles[i + width - 1]	!= extraCheck;
 
 	return (edges);
 }
@@ -197,23 +218,26 @@ void	CACAGraphicsDL::render(const GameState &gameState)
 			continue ;
 		if (tiles[i] == Tile::P1_SNAKE_HEAD || tiles[i] == Tile::P2_SNAKE_HEAD)
 		{
-			saves.push_front({tiles[i], {x, y}, setupAdjacents(tiles, i, width)});
+			saves.push_front({tiles[i], {x, y}, setupAdjacents(tiles, i, width, Tile::WALL)});
 			continue;
 		}
 		if (tiles[i] != Tile::P1_SNAKE_BODY && tiles[i] != Tile::P2_SNAKE_BODY && tiles[i] != Tile::WALL)
 		{
-			saves.push_back({tiles[i], {x, y}, setupAdjacents(tiles, i, width)});
+			saves.push_back({tiles[i], {x, y}, setupAdjacents(tiles, i, width, Tile::WALL)});
 			continue;
 		}
 
 		setColor(_canvas, tiles[i]);
-		if (tiles[i] == Tile::P1_SNAKE_BODY || tiles[i] == Tile::P2_SNAKE_BODY)
+		if (x == 0 || x == int(width) - 1 || y == 0 || y == int(height) - 1)
+			placeLine(_canvas, x, y, width, height);
+		else
 		{
-			edges = setupAdjacents(tiles, i, width);
+			if (tiles[i] == Tile::WALL)
+				edges = setupAdjacents(tiles, i, width, Tile::EMPTY);
+			else
+				edges = setupAdjacents(tiles, i, width, Tile::WALL);
 			placeSquare(_canvas, x, y, edges);
 		}
-		else
-			placeLine(_canvas, x, y, width, height);
 	}
 
 	for (auto save : saves)

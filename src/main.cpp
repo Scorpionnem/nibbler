@@ -4,10 +4,11 @@
 
 void    usage()
 {
-    std::cerr << "Usage:\n  ./Nibbler [width] [height] <ip_port>\n\n";
+    std::cerr << "Usage:\n  ./Nibbler [width] [height] <ip_port or flag>\n\n";
     std::cerr << "min size: " << MIN_SIZE << '\n';
     std::cerr << "max size: " << MAX_SIZE << '\n';
-    std::cerr << "ip format: ip:port" << std::endl;
+    std::cerr << "ip format: ip:port" << MAX_SIZE << '\n';
+    std::cerr << "flag: -w [Enable Walls]" << std::endl;
 }
 
 int main(int ac, char **av)
@@ -28,7 +29,9 @@ int main(int ac, char **av)
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
 	Nibbler nib;
-	if (ac == 4 && nib.playOnline(width, height, av[3]) == -1)
+	if (ac == 4 && std::string(av[3]) != "-w" && nib.playOnline(width, height, av[3]) == -1)
+		return (1);
+	else if (ac == 4 && std::string(av[3]) == "-w" && nib.play(width, height, true) == -1)
 		return (1);
     else if (ac == 3 && nib.play(width, height) == -1)
         return (1);

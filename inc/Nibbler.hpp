@@ -58,7 +58,7 @@ class   Nibbler
         Nibbler() {}
         ~Nibbler() {}
 
-        int	play(int width, int height);
+        int	play(int width, int height, bool addWalls = false);
 		int	playOnline(int width, int height, const std::string &port);
     private:
         enum class Direction
@@ -75,6 +75,7 @@ class   Nibbler
         int         _loadADL(const char *path);
         void        _unloadADL();
 
+		bool		_isMapValid();
         void        _reset();
         bool        _spawnFood();
         void        _handleInput(GraphicsDL::Input in);
@@ -87,6 +88,10 @@ class   Nibbler
 
         bool    _running = false;
         bool    _paused = false;
+
+		std::vector<Vec2i>	_walls;
+		bool				_addWalls = true;
+
 
         std::deque<Vec2i>   _snake;
         Direction   _dir = Direction::RIGHT;
