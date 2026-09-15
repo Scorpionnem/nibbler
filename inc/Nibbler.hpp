@@ -8,6 +8,7 @@
 # include <sys/socket.h>
 # include <errno.h>
 # include <cstring>
+# include <regex>
 
 #include "shared/AudioDL.hpp"
 #include "shared/GraphicsDL.hpp"
@@ -58,8 +59,9 @@ class   Nibbler
         Nibbler() {}
         ~Nibbler() {}
 
-        int	play(int width, int height, bool addWalls = false);
-		int	playOnline(int width, int height, const std::string &port);
+        int		play(int width, int height);
+		int		playOnline(int width, int height, const std::string &port);
+		void	setAddWalls();
     private:
         enum class Direction
         {
@@ -90,7 +92,7 @@ class   Nibbler
         bool    _paused = false;
 
 		std::vector<Vec2i>	_walls;
-		bool				_addWalls = true;
+		bool				_addWalls = false;
 
 
         std::deque<Vec2i>   _snake;

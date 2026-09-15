@@ -29,10 +29,32 @@ int main(int ac, char **av)
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
 	Nibbler nib;
-	if (ac == 4 && std::string(av[3]) != "-w" && nib.playOnline(width, height, av[3]) == -1)
-		return (1);
-	else if (ac == 4 && std::string(av[3]) == "-w" && nib.play(width, height, true) == -1)
-		return (1);
+
+	if (ac == 4)
+	{
+		if (std::regex_match(av[3], std::regex("([0-9]+\\.){3}[0-9]+:[0-9]+"))
+			&& nib.playOnline(width, height, av[3]) == -1)
+			return (1);
+		else if (*av[3])
+		{
+			av[3]++;
+			for (; *av[3]; ++av[3])
+			{
+				switch (*av[3])
+				{
+					case ('w'):
+						nib.setAddWalls();
+						break;
+					default:
+						return (1);
+				}
+			}
+			if (nib.play(width, height) == -1)
+				return (1);
+		}
+		else
+			return (1);
+	}
     else if (ac == 3 && nib.play(width, height) == -1)
         return (1);
 

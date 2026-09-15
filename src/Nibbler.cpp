@@ -18,11 +18,15 @@ const char *adlLibsPaths[3] =
     "libs/sdl_audio/nibbler_sdl_audio.so",
 };
 
-int Nibbler::play(int width, int height, bool addWalls)
+void	Nibbler::setAddWalls()
+{
+	_addWalls = true;
+}
+
+int Nibbler::play(int width, int height)
 {
     _width = width;
     _height = height;
-	_addWalls = addWalls;
 
     if (_loadGDL(gdlLibsPaths[0]) == -1)
     {
