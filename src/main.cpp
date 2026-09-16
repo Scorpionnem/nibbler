@@ -8,7 +8,10 @@ void    usage()
     std::cerr << "min size: " << MIN_SIZE << '\n';
     std::cerr << "max size: " << MAX_SIZE << '\n';
     std::cerr << "ip format: ip:port" << MAX_SIZE << '\n';
-    std::cerr << "flag: -w [Enable Walls]" << std::endl;
+    std::cerr << "flag:\t [ex: -wep]" << std::endl;
+	std::cerr << "\t -w [Enable Walls]" << std::endl;
+	std::cerr << "\t -e [Enable Enemy]" << std::endl;
+	std::cerr << "\t -p [Enable Path]" << std::endl;
 }
 
 int main(int ac, char **av)
@@ -43,7 +46,13 @@ int main(int ac, char **av)
 				switch (*av[3])
 				{
 					case ('w'):
-						nib.setAddWalls();
+						nib.enableWalls();
+						break;
+					case ('e'):
+						nib.enableEnemy();
+						break;
+					case ('p'):
+						nib.enablePathfinding();
 						break;
 					default:
 						return (1);

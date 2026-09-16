@@ -61,7 +61,10 @@ class   Nibbler
 
         int		play(int width, int height);
 		int		playOnline(int width, int height, const std::string &port);
-		void	setAddWalls();
+		
+		void	enableWalls();
+		void	enableEnemy();
+		void	enablePathfinding();
     private:
         enum class Direction
         {
@@ -85,15 +88,20 @@ class   Nibbler
         GameState   _buildState() const;
         GameState   _buildState(const MapPacket &map) const;
 
+		void		_setPath(std::vector<Tile> &tiles) const;
+		void		_moveEnemy();
+
         int _width = 0;
         int _height = 0;
 
         bool    _running = false;
         bool    _paused = false;
 
-		std::vector<Vec2i>	_walls;
 		bool				_addWalls = false;
-
+		std::vector<Vec2i>	_walls;
+		bool				_enemy = false;
+		Vec2i				_enemyPos;
+		bool				_pathfinding = false;
 
         std::deque<Vec2i>   _snake;
         Direction   _dir = Direction::RIGHT;

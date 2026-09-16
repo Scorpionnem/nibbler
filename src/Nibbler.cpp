@@ -18,9 +18,18 @@ const char *adlLibsPaths[3] =
     "libs/sdl_audio/nibbler_sdl_audio.so",
 };
 
-void	Nibbler::setAddWalls()
+void	Nibbler::enableWalls()
 {
 	_addWalls = true;
+}
+void	Nibbler::enableEnemy()
+{
+	_enemy = true;
+}
+
+void	Nibbler::enablePathfinding()
+{
+	_pathfinding = true;
 }
 
 int Nibbler::play(int width, int height)
@@ -124,12 +133,21 @@ void    Nibbler::_reset()
     _snake.push_back(Vec2i(cx - 2, cy));
     _snake.push_back(Vec2i(cx - 3, cy));
 
+	do
+	{
+		_enemyPos = {int(float(rand()) / float(RAND_MAX) * (_width - 2.) + 1), int(float(rand()) / float(RAND_MAX) * (_height - 2.) + 1)};
+	} while ((_enemyPos.x > cx - 4 && _enemyPos.x < cx + 4) || (_enemyPos.y > cy - 4 && _enemyPos.y < cy + 4));
+	
+
     _dir = Direction::RIGHT;
     _queuedDir = Direction::RIGHT;
     _turnLocked = false;
     _pendingGrowth = false;
 
     _spawnFood();
+
+	bool savePath = _pathfinding;
+	_pathfinding = false;
 
 	if (_addWalls)
 	{
@@ -142,14 +160,18 @@ void    Nibbler::_reset()
 			for (int i = 0; i < nbWalls; ++i)
 			{
 				Vec2i	tryPos;
-				bool isGood = true;
+				bool	isGood = true;
 				do
 				{
 					isGood = true;
 					tryPos = {int(float(rand()) / float(RAND_MAX) * (_width - 2.) + 1), int(float(rand()) / float(RAND_MAX) * (_height - 2.) + 1)};
 
-					if (tryPos == _food)
+					if (tryPos == _food
+						|| (tryPos.x > cx - 3 && tryPos.x < cx + 3) || (tryPos.y > cy - 2 && tryPos.y < cy + 2))
+					{
+						isGood = false;
 						continue;
+					}
 
 					for (const Vec2i &seg : _snake)
 					{
@@ -167,6 +189,8 @@ void    Nibbler::_reset()
 							break ;
 						}
 					}
+					if (tryPos == _enemyPos)
+						isGood = false;
 				} while (!isGood);
 				
 				_walls.push_back(tryPos);
@@ -174,6 +198,7 @@ void    Nibbler::_reset()
 
 		} while (!_isMapValid());
 	}
+	_pathfinding = savePath;
 }
 
 bool    Nibbler::_spawnFood()
@@ -202,6 +227,8 @@ bool    Nibbler::_spawnFood()
                     break ;
                 }
 			}
+			if (_enemyPos == pos)
+				onSnake = true;
 
             if (!onSnake)
                 possiblePos.push_back(pos);
@@ -277,12 +304,61 @@ void    Nibbler::_handleInput(GraphicsDL::Input in)
     _turnLocked = true;
 }
 
+void	distFill(std::vector<Tile> &tiles, std::vector<int> &dists, const int &x, const int &y, const int &width, const Vec2i &target)
+{
+	if ((tiles[y * width + x] == Tile::WALL || tiles[y * width + x] == Tile::NONE
+		|| tiles[y * width + x] == Tile::RED_APPLE || tiles[y * width + x] == Tile::ENEMY
+		|| tiles[y * width + x] == Tile::P1_SNAKE_BODY || tiles[y * width + x] == Tile::P1_SNAKE_HEAD) && !(Vec2i{x, y} == target))
+		return ;
+	
+	tiles[y * width + x] = Tile::NONE;
+	dists[y * width + x] = (x - target.x) * (x - target.x) + (y - target.y) * (y - target.y);
+
+	distFill(tiles, dists, x + 1, y, width, target);
+	distFill(tiles, dists, x - 1, y, width, target);
+	distFill(tiles, dists, x, y + 1, width, target);
+	distFill(tiles, dists, x, y - 1, width, target);
+}
+
+void	Nibbler::_moveEnemy()
+{
+	std::vector<Tile>	tiles = _buildState().tiles();
+	std::vector<int>	dists(_width * _height, _width * _height);
+
+	bool savePath = _pathfinding;
+	_pathfinding = false;
+	distFill(tiles, dists, _snake.front().x, _snake.front().y, _width, {_snake.front().x, _snake.front().y});
+	_pathfinding = savePath;
+
+	if (dists[_enemyPos.y * _width + _enemyPos.x - 1] < dists[_enemyPos.y * _width + _enemyPos.x + 1]
+		&& dists[_enemyPos.y * _width + _enemyPos.x - 1] < dists[(_enemyPos.y + 1) * _width + _enemyPos.x]
+		&& dists[_enemyPos.y * _width + _enemyPos.x - 1] < dists[(_enemyPos.y - 1) * _width + _enemyPos.x])
+		_enemyPos.x --;
+	else if (dists[_enemyPos.y * _width + _enemyPos.x + 1] < dists[(_enemyPos.y + 1) * _width + _enemyPos.x]
+		&& dists[_enemyPos.y * _width + _enemyPos.x + 1] < dists[(_enemyPos.y - 1) * _width + _enemyPos.x])
+		_enemyPos.x ++;
+	else if (dists[(_enemyPos.y + 1) * _width + _enemyPos.x] < dists[(_enemyPos.y - 1) * _width + _enemyPos.x])
+		_enemyPos.y ++;
+	else
+		_enemyPos.y --;
+}
+
 bool    Nibbler::_tick()
 {
     _dir = _queuedDir;
     _turnLocked = false;
 
     Vec2i   head = _snake.front();
+
+	if (_enemy)
+	{
+		if (head == _enemyPos)
+			return (false);
+		_moveEnemy();
+		if (head == _enemyPos)
+			return (false);
+	}
+
     switch (_dir)
     {
         case Direction::UP:
@@ -328,6 +404,36 @@ bool    Nibbler::_tick()
     return (true);
 }
 
+void	Nibbler::_setPath(std::vector<Tile> &tiles) const
+{
+	std::vector<Tile>	ntiles(tiles);
+	std::vector<int>	dists(_width * _height, (_width * _height) + (_width * _height));
+
+	distFill(ntiles, dists, _food.x, _food.y, _width, {_food.x, _food.y});
+
+	int		x = _snake.front().x;
+	int		y = _snake.front().y;
+
+	do
+	{
+		if (dists[y * _width + x - 1] < dists[y * _width + x + 1]
+			&& dists[y * _width + x - 1] < dists[(y + 1) * _width + x]
+			&& dists[y * _width + x - 1] < dists[(y - 1) * _width + x])
+			x --;
+		else if (dists[y * _width + x + 1] < dists[(y + 1) * _width + x]
+			&& dists[y * _width + x + 1] < dists[(y - 1) * _width + x])
+			x ++;
+		else if (dists[(y + 1) * _width + x] < dists[(y - 1) * _width + x])
+			y ++;
+		else
+			y --;
+
+		if (tiles[y * _width + x] != Tile::RED_APPLE)
+			tiles[y * _width + x] = Tile::PATH;
+	} while (tiles[y * _width + x] != Tile::RED_APPLE && dists[y * _width + x] != (_width * _height) + (_width * _height));
+
+}
+
 GameState   Nibbler::_buildState() const
 {
     std::vector<Tile>   tiles(_width * _height, Tile::EMPTY);
@@ -351,6 +457,11 @@ GameState   Nibbler::_buildState() const
 
 	for (auto wall : _walls)
 		tiles[wall.y * _width + wall.x] = Tile::WALL;
+
+	if (_enemy)
+		tiles[_enemyPos.y * _width + _enemyPos.x] = Tile::ENEMY;
+	if (_pathfinding)
+		_setPath(tiles);
 
     return (GameState(tiles, _width, _height));
 }

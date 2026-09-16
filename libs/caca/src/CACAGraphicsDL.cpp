@@ -6,7 +6,7 @@
 /*   By: mbirou <mbirou@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/26 10:05:00 by mbirou            #+#    #+#             */
-/*   Updated: 2026/09/13 13:17:14 by mbirou           ###   ########.fr       */
+/*   Updated: 2026/09/16 12:50:50 by mbirou           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,12 @@ void	setColor(caca_canvas_t *canvas, Tile tile)
 			break;
 		case Tile::RED_APPLE:
 			caca_set_color_ansi(canvas, CACA_RED, CACA_BLACK);
+			break;
+		case Tile::ENEMY:
+			caca_set_color_ansi(canvas, CACA_BROWN, CACA_BLACK);
+			break;
+		case Tile::PATH:
+			caca_set_color_ansi(canvas, CACA_YELLOW, CACA_BLACK);
 			break;
 		default:
 			break;
@@ -182,14 +188,14 @@ Edges	setupAdjacents(const std::vector<Tile> &tiles, const int &i,const int &wid
 {
 	Edges	edges;
 
-	edges.W		= tiles[i - 1]			!= Tile::EMPTY && tiles[i - 1]			!= extraCheck;
-	edges.NW	= tiles[i - width - 1]	!= Tile::EMPTY && tiles[i - width - 1]	!= extraCheck;
-	edges.N		= tiles[i - width]		!= Tile::EMPTY && tiles[i - width]		!= extraCheck;
-	edges.NE	= tiles[i - width + 1]	!= Tile::EMPTY && tiles[i - width + 1]	!= extraCheck;
-	edges.E		= tiles[i + 1]			!= Tile::EMPTY && tiles[i + 1]			!= extraCheck;
-	edges.SE	= tiles[i + width + 1]	!= Tile::EMPTY && tiles[i + width + 1]	!= extraCheck;
-	edges.S		= tiles[i + width]		!= Tile::EMPTY && tiles[i + width]		!= extraCheck;
-	edges.SW	= tiles[i + width - 1]	!= Tile::EMPTY && tiles[i + width - 1]	!= extraCheck;
+	edges.W		= tiles[i - 1]			!= Tile::EMPTY && tiles[i - 1]			!= Tile::PATH && tiles[i - 1]			!= extraCheck;
+	edges.NW	= tiles[i - width - 1]	!= Tile::EMPTY && tiles[i - width - 1]	!= Tile::PATH && tiles[i - width - 1]	!= extraCheck;
+	edges.N		= tiles[i - width]		!= Tile::EMPTY && tiles[i - width]		!= Tile::PATH && tiles[i - width]		!= extraCheck;
+	edges.NE	= tiles[i - width + 1]	!= Tile::EMPTY && tiles[i - width + 1]	!= Tile::PATH && tiles[i - width + 1]	!= extraCheck;
+	edges.E		= tiles[i + 1]			!= Tile::EMPTY && tiles[i + 1]			!= Tile::PATH && tiles[i + 1]			!= extraCheck;
+	edges.SE	= tiles[i + width + 1]	!= Tile::EMPTY && tiles[i + width + 1]	!= Tile::PATH && tiles[i + width + 1]	!= extraCheck;
+	edges.S		= tiles[i + width]		!= Tile::EMPTY && tiles[i + width]		!= Tile::PATH && tiles[i + width]		!= extraCheck;
+	edges.SW	= tiles[i + width - 1]	!= Tile::EMPTY && tiles[i + width - 1]	!= Tile::PATH && tiles[i + width - 1]	!= extraCheck;
 
 	return (edges);
 }
@@ -243,7 +249,10 @@ void	CACAGraphicsDL::render(const GameState &gameState)
 	for (auto save : saves)
 	{
 		setColor(_canvas, save.tile);
-		placeSquare(_canvas, save.pos[0], save.pos[1], save.edges);
+		if (save.tile == Tile::PATH)
+			caca_put_str(_canvas, save.pos[0] * TILE_SIZE + TILE_SIZE / 2, save.pos[1], "·");
+		else
+			placeSquare(_canvas, save.pos[0], save.pos[1], save.edges);
 	}
 
 	caca_refresh_display(_display);
