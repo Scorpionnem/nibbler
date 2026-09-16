@@ -1,5 +1,5 @@
 NAME :=	Nibbler
-SERVERNAME :=	Nibbler_server
+SERVER :=	Nibbler_server
 
 CXX :=		c++
 CXXFLAGS :=	-g -MP -MMD -Wall -Wextra -Werror -std=c++17 -O3 -pthread
@@ -24,7 +24,7 @@ SDL_SO := libs/sdl/nibbler_sdl.so
 CACA_SO := libs/caca/nibbler_caca.so
 MBATTY_SO := libs/mbatty/mbattylib.so
 
-all: $(SDL_SO) $(CACA_SO) $(SDL_AU) $(MBATTY_SO) $(NAME)
+all: $(SDL_SO) $(CACA_SO) $(SDL_AU) $(MBATTY_SO) $(SERVER) $(NAME)
 
 $(NAME): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LFLAGS)
@@ -45,7 +45,7 @@ $(CACA_SO):
 $(MBATTY_SO):
 	@make -C libs/mbatty/ all --no-print-directory
 
-server:
+$(SERVER):
 	@make -C server/ all --no-print-directory
 	@mv -T server/server Nibbler_server
 
@@ -65,7 +65,7 @@ fclean:
 	@make -C server/ fclean --no-print-directory
 	rm -rf $(OBJ_DIR)
 	rm -rf $(NAME)
-	rm -rf $(SERVERNAME)
+	rm -rf $(SERVER)
 
 re: fclean all
 
