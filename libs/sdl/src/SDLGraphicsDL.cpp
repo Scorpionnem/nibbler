@@ -46,6 +46,12 @@ static void	setColor(SDL_Renderer *renderer, Tile tile)
 		case Tile::RED_APPLE:
 			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 			break;
+		case Tile::ENEMY:
+			SDL_SetRenderDrawColor(renderer, 150, 75, 0, 255);
+			break;
+		case Tile::PATH:
+			SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+			break;
 		case Tile::EMPTY:
 		default:
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -79,6 +85,13 @@ void	SDLGraphicsDL::render(const GameState &gameState)
 		rect.y = y * TILE_SIZE;
 		rect.w = TILE_SIZE;
 		rect.h = TILE_SIZE;
+		if (tiles[i] == Tile::PATH)
+		{
+			rect.x = x * TILE_SIZE + (TILE_SIZE / 4.0);
+			rect.y = y * TILE_SIZE + (TILE_SIZE / 4.0);
+			rect.w = TILE_SIZE / 2.0;
+			rect.h = TILE_SIZE / 2.0;
+		}
 		SDL_RenderFillRect(_renderer, &rect);
 	}
 

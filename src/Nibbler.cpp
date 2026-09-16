@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <ctime>
+#include <queue>
 
 #include "Nibbler.hpp"
 
@@ -137,7 +138,7 @@ void    Nibbler::_reset()
 	{
 		_enemyPos = {int(float(rand()) / float(RAND_MAX) * (_width - 2.) + 1), int(float(rand()) / float(RAND_MAX) * (_height - 2.) + 1)};
 	} while ((_enemyPos.x > cx - 4 && _enemyPos.x < cx + 4) || (_enemyPos.y > cy - 4 && _enemyPos.y < cy + 4));
-	
+
 
     _dir = Direction::RIGHT;
     _queuedDir = Direction::RIGHT;
@@ -192,7 +193,7 @@ void    Nibbler::_reset()
 					if (tryPos == _enemyPos)
 						isGood = false;
 				} while (!isGood);
-				
+
 				_walls.push_back(tryPos);
 			}
 
@@ -304,20 +305,43 @@ void    Nibbler::_handleInput(GraphicsDL::Input in)
     _turnLocked = true;
 }
 
+static bool	_isDistBlocked(Tile tile)
+{
+	return (tile == Tile::WALL || tile == Tile::NONE || tile == Tile::RED_APPLE
+		|| tile == Tile::ENEMY || tile == Tile::P1_SNAKE_BODY || tile == Tile::P1_SNAKE_HEAD);
+}
+
 void	distFill(std::vector<Tile> &tiles, std::vector<int> &dists, const int &x, const int &y, const int &width, const Vec2i &target)
 {
-	if ((tiles[y * width + x] == Tile::WALL || tiles[y * width + x] == Tile::NONE
-		|| tiles[y * width + x] == Tile::RED_APPLE || tiles[y * width + x] == Tile::ENEMY
-		|| tiles[y * width + x] == Tile::P1_SNAKE_BODY || tiles[y * width + x] == Tile::P1_SNAKE_HEAD) && !(Vec2i{x, y} == target))
-		return ;
-	
-	tiles[y * width + x] = Tile::NONE;
-	dists[y * width + x] = (x - target.x) * (x - target.x) + (y - target.y) * (y - target.y);
+	(void)target;
 
-	distFill(tiles, dists, x + 1, y, width, target);
-	distFill(tiles, dists, x - 1, y, width, target);
-	distFill(tiles, dists, x, y + 1, width, target);
-	distFill(tiles, dists, x, y - 1, width, target);
+	std::queue<Vec2i>	toVisit;
+
+	tiles[y * width + x] = Tile::NONE;
+	dists[y * width + x] = 0;
+	toVisit.push(Vec2i(x, y));
+
+	while (!toVisit.empty())
+	{
+		Vec2i	cur = toVisit.front();
+		toVisit.pop();
+
+		int			dist = dists[cur.y * width + cur.x];
+		const Vec2i	neighbors[4] = {
+			Vec2i(cur.x + 1, cur.y), Vec2i(cur.x - 1, cur.y),
+			Vec2i(cur.x, cur.y + 1), Vec2i(cur.x, cur.y - 1)
+		};
+
+		for (const Vec2i &n : neighbors)
+		{
+			if (_isDistBlocked(tiles[n.y * width + n.x]))
+				continue ;
+
+			tiles[n.y * width + n.x] = Tile::NONE;
+			dists[n.y * width + n.x] = dist + 1;
+			toVisit.push(n);
+		}
+	}
 }
 
 void	Nibbler::_moveEnemy()

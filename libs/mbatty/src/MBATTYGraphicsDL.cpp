@@ -59,6 +59,10 @@ namespace
 				return (vec3f(0, 255, 0) / scale);
 			case Tile::RED_APPLE:
 				return (vec3f(255, 0, 0) / scale);
+			case Tile::ENEMY:
+				return (vec3f(150, 75, 0) / scale);
+			case Tile::PATH:
+				return (vec3f(255, 255, 0) / scale);
 			case Tile::EMPTY:
 			default:
 				return (vec3f(0, 0, 0));
@@ -189,8 +193,19 @@ void	MBATTYGraphicsDL::render(const GameState &gameState)
 		int	y = static_cast<int>(i / width);
 
 		vec3f	pos = vec3f(x * TILE_SIZE, 0, y * TILE_SIZE);
+		vec3f	scale = vec3f(TILE_SIZE, TILE_SIZE, TILE_SIZE);
 
-		_mesh_shader->setMat4("uModel", mat4f::translate(pos) * mat4f::scale(vec3f(TILE_SIZE, TILE_SIZE, TILE_SIZE)));
+		if (tiles[i] == Tile::PATH)
+		{
+			pos.x() = x * TILE_SIZE + (TILE_SIZE / 4.0);
+			pos.z() = y * TILE_SIZE + (TILE_SIZE / 4.0);
+			scale.x() = TILE_SIZE / 2.0;
+			scale.z() = TILE_SIZE / 2.0;
+		}
+		if (tiles[i] == Tile::ENEMY)
+			scale.y() = 5;
+
+		_mesh_shader->setMat4("uModel", mat4f::translate(pos) * mat4f::scale(scale));
 		_mesh_shader->setVec3("uColor", tileColor(tiles[i]));
 		_tile_mesh->draw(GL_TRIANGLES);
 	}
