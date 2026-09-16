@@ -16,6 +16,7 @@
 # include <errno.h>
 # include <stdio.h>
 # include <stdbool.h>
+# include <signal.h>
 
 #define MAX_CLIENTS (2)
 #define MAX_CONNECTIONS (16)
@@ -105,6 +106,12 @@ class	Server
 			inet_ntop(AF_INET, &addr.sin_addr, buf, sizeof(buf) - 1);
 
 			std::cout << "server open: " << buf << " " << ntohs(addr.sin_port) << std::endl;
+		}
+		~Server()
+		{
+			close(_fd);
+			for (auto client : _clients)
+				close(client.first);
 		}
 		void	update()
 		{
@@ -402,7 +409,7 @@ class	Server
 								}
 							}
 						} while (!isGood);
-						
+
 						_walls.push_back(tryPos);
 					}
 
@@ -433,14 +440,14 @@ class	Server
 				_players[_clients.size()] = client_fd;
 				_clients.insert({client_fd, {.fd = client_fd}});
 			}
-			
+
 		}
 
 		void	_sendPacket(const int &fd, const uint8_t *data, const uint64_t &size)
 		{
 			::send(fd, data, size, MSG_DONTWAIT);
 		}
-		
+
 		void	_sendDeath(const int &fd, const bool lost = false)
 		{
 			DeathPacket	death;
@@ -501,7 +508,7 @@ class	Server
 
 			return (map);
 		}
-		
+
 		void	_sendMap(const int &fd)
 		{
 			MapPacket	map = makeMap();
@@ -639,43 +646,57 @@ class	Server
 		std::vector<Vec2i>					_walls;
 };
 
+bool	running = true;
+
+void	closeServ(int sig)
+{
+	if (sig == SIGINT)
+		running = false;
+}
+
 int	main(int ac, char **av)
 {
-	if (ac != 2 && ac != 3)
-	{
-		std::cerr << "Usage: ./server <port> <flag>" << std::endl;
-		std::cerr << "flag: -w [Enable Walls]" << std::endl;
-		return (1);
-	}
-
-	Server	server;
-	Chrono	chrono;
-
-	if (ac == 3 && std::string(av[2]) != "-w")
-	{
-		std::cerr << "flag is invalid: the only flag is '-w'" << std::endl;
-		return (1);
-	}
-	else if (ac == 3)
-		server.enableWalls();
-
-	server.open(std::atoi(av[1]));
-	
-	bool	isFirst = true;
-	chrono.start();
-	while (1)
-	{
-		server.update();
-
-		if (server.getNbClients() == MAX_CLIENTS && chrono.get() >= 0.2)
+	try {
+		if (ac != 2 && ac != 3)
 		{
-			if (isFirst)
-			{
-				server.reset();
-				isFirst = false;
-			}
-			server.tick();
-			chrono.start();
+			std::cerr << "Usage: ./server <port> <flag>" << std::endl;
+			std::cerr << "flag: -w [Enable Walls]" << std::endl;
+			return (1);
 		}
+
+		signal(SIGINT, closeServ);
+
+		Server	server;
+		Chrono	chrono;
+
+		if (ac == 3 && std::string(av[2]) != "-w")
+		{
+			std::cerr << "flag is invalid: the only flag is '-w'" << std::endl;
+			return (1);
+		}
+		else if (ac == 3)
+			server.enableWalls();
+
+		server.open(std::atoi(av[1]));
+
+		bool	isFirst = true;
+		chrono.start();
+		while (running)
+		{
+			server.update();
+
+			if (server.getNbClients() == MAX_CLIENTS && chrono.get() >= 0.2)
+			{
+				if (isFirst)
+				{
+					server.reset();
+					isFirst = false;
+				}
+				server.tick();
+				chrono.start();
+			}
+		}
+	} catch (const std::exception &e) {
+		std::cout << std::endl << e.what() << std::endl;
 	}
 }
