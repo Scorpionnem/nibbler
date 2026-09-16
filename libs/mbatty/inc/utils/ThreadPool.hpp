@@ -10,7 +10,7 @@
 #include <functional>
 #include <unistd.h>
 
-class	ThreadPool
+struct	ThreadPool
 {
 	public:
 		ThreadPool() : _active_tasks(0), _stop(false) {}

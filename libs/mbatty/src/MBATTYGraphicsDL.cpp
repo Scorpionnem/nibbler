@@ -106,13 +106,13 @@ GraphicsDL::Input	MBATTYGraphicsDL::getInput()
 
 		_cam->aspect = input.aspect();
 
-		if (input.wasPressed(SDLK_w))
+		if (input.wasPressed(SDLK_w) || input.wasPressed(SDLK_UP))
 			_up_input = true;
-		if (input.wasPressed(SDLK_s))
+		if (input.wasPressed(SDLK_s) || input.wasPressed(SDLK_DOWN))
 			_down_input = true;
-		if (input.wasPressed(SDLK_a))
+		if (input.wasPressed(SDLK_a) || input.wasPressed(SDLK_LEFT))
 			_left_input = true;
-		if (input.wasPressed(SDLK_d))
+		if (input.wasPressed(SDLK_d) || input.wasPressed(SDLK_RIGHT))
 			_right_input = true;
 		if (input.wasPressed(SDLK_ESCAPE) || input.close())
 			_close_input = true;

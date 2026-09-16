@@ -5,7 +5,7 @@
 struct SDL_Window;
 struct SDL_Renderer;
 
-class	SDLGraphicsDL : public GraphicsDL
+struct	SDLGraphicsDL : public GraphicsDL
 {
 	public:
 		SDLGraphicsDL() {}

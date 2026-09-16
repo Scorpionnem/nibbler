@@ -9,13 +9,13 @@
 #include "utils/ThreadPool.hpp"
 #include "ui/UI.hpp"
 
-class   App
+struct   App
 {
     #define TARGET_WINDOW_WIDTH 860
     #define TARGET_WINDOW_HEIGHT 520
 
     private:
-        enum class State
+        enum struct State
         {
             RUNNING,
         };

@@ -2,23 +2,23 @@
 
 #include "GameState.hpp"
 
-class	GraphicsDL
+struct	GraphicsDL
 {
 	public:
-		enum class Input
+		enum struct Input
 		{
 			UP,
 			DOWN,
 			LEFT,
 			RIGHT,
-			
+
 			CLOSE,
 			SWITCH1,
 			SWITCH2,
 			SWITCH3,
 
 			PAUSE,
-			
+
 			NONE,
 		};
 	public:

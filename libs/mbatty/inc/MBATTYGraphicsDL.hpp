@@ -4,12 +4,12 @@
 
 #include <deque>
 
-class	Window;
-class	Mesh;
-class	Shader;
+struct	Window;
+struct	Mesh;
+struct	Shader;
 struct	Camera;
 
-class	MBATTYGraphicsDL : public GraphicsDL
+struct	MBATTYGraphicsDL : public GraphicsDL
 {
 	public:
 		MBATTYGraphicsDL() {}

@@ -1,9 +1,9 @@
 #pragma once
 
-class	AudioDL
+struct	AudioDL
 {
 	public:
-		enum class Sound
+		enum struct Sound
 		{
 			MOVE,
 			EAT,

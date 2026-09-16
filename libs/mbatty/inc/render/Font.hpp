@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <string>
 
-class	Font
+struct	Font
 {
 	public:
 		Font() {}

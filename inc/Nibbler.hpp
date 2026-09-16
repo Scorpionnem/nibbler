@@ -14,10 +14,12 @@
 #include "shared/GraphicsDL.hpp"
 #include "shared/Packets.hpp"
 #include "Vec2.hpp"
+#include <unistd.h>
 
-class	Client
+struct	Client
 {
 	public:
+		~Client() {::close(_fd);}
 		void	connect(const char *addr, int port)
 		{
 			struct sockaddr_in	serv_addr;
@@ -53,7 +55,39 @@ class	Client
 		int	_fd;
 };
 
-class   Nibbler
+#include <ctime>
+
+struct	Chrono
+{
+	public:
+		Chrono()
+		{
+			start();
+		}
+		~Chrono() {}
+
+		void	start()
+		{
+			_start = getTime();
+		}
+		double	get()
+		{
+			return (getTime() - _start);
+		}
+
+		static double getTime()
+		{
+			double	res;
+			struct timespec	current;
+			clock_gettime(CLOCK_MONOTONIC, &current);
+			res = (current.tv_sec) + (current.tv_nsec) * 1e-9;
+			return (res);
+		}
+	private:
+		double		_start = 0;
+};
+
+struct   Nibbler
 {
     public:
         Nibbler() {}
@@ -61,12 +95,12 @@ class   Nibbler
 
         int		play(int width, int height);
 		int		playOnline(int width, int height, const std::string &port);
-		
+
 		void	enableWalls();
 		void	enableEnemy();
 		void	enablePathfinding();
     private:
-        enum class Direction
+        enum struct Direction
         {
             UP,
             DOWN,
@@ -118,4 +152,6 @@ class   Nibbler
         void        *_adlHandle = nullptr;
 
 		Client	_client;
+
+		Chrono	_time;
 };

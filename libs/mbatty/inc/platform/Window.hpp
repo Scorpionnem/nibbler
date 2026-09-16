@@ -9,7 +9,7 @@
 
 #include <string>
 
-class Window
+struct Window
 {
 	public:
 		Window();

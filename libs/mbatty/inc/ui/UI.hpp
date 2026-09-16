@@ -12,10 +12,10 @@
 #include <cmath>
 #include <vector>
 
-class UI
+struct UI
 {
     public:
-        enum class Anchor
+        enum struct Anchor
         {
             CENTER,
             TOP_LEFT,

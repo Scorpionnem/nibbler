@@ -3,7 +3,7 @@
 #define MIN_SIZE 10
 #define MAX_SIZE 42
 
-enum class	Tile
+enum struct	Tile
 {
 	WALL = 'W',
 	P1_SNAKE_HEAD = 'H',

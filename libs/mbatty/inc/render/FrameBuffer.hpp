@@ -4,7 +4,7 @@
 #include "render/Texture.hpp"
 #include "math.hpp"
 
-class   FrameBuffer
+struct   FrameBuffer
 {
     public:
         FrameBuffer() {}

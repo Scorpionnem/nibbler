@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-class   TextureAtlas
+struct   TextureAtlas
 {
     public:
         TextureAtlas() {}

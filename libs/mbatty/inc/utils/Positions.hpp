@@ -2,7 +2,7 @@
 
 #include "math.hpp"
 
-enum class Facing
+enum struct Facing
 {
 	POS_X,
 	NEG_X,
@@ -13,7 +13,7 @@ enum class Facing
 	INVALID,
 };
 
-enum class FacingCardinal
+enum struct FacingCardinal
 {
 	NORTH = static_cast<int>(Facing::NEG_Z),
 	SOUTH = static_cast<int>(Facing::POS_Z),

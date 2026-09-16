@@ -3,9 +3,9 @@
 #include "math.hpp"
 #include <unordered_map>
 
-class Window;
+struct Window;
 
-class Input
+struct Input
 {
 	public:
 		Input();

@@ -63,7 +63,6 @@ int Nibbler::play(int width, int height)
             in = _gdl->getInput();
             _handleInput(in);
         } while (in != GraphicsDL::Input::NONE);
-
         if (_pendingSwitch != -1)
         {
             int idx = _pendingSwitch;
@@ -75,14 +74,14 @@ int Nibbler::play(int width, int height)
                 _gdl->open(_buildState());
         }
 
-        if (!_paused && !_tick())
-            break ;
-
+	    if (_time.get() > 0.15)
+	    {
+			_time.start();
+	        if (!_paused && !_tick())
+	            break ;
+	    }
 		if (!_paused)
        		_gdl->render(_buildState());
-
-        if (_running)
-            usleep(200000);
     }
 
     _gdl->stop();

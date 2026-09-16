@@ -6,7 +6,7 @@
 
 #include "shared/Tile.hpp"
 
-class	GameState
+struct	GameState
 {
 	public:
 		GameState(std::vector<Tile> tiles, uint32_t width, uint32_t height)

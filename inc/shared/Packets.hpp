@@ -9,7 +9,7 @@
 
 #define MAX_MAP_SIZE MAX_SIZE * MAX_SIZE // 42 * 42
 
-enum class PacketType
+enum struct PacketType
 {
 	CONNECTION,
 	MAPPACKET,
@@ -49,7 +49,7 @@ struct	PacketHeader
 struct ConnectionPacket
 {
 	PacketHeader	hdr;
-	enum class Status
+	enum struct Status
 	{
 		SUCCESS,
 		FAIL,

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-class	Chrono
+struct	Chrono
 {
 	public:
 		Chrono()

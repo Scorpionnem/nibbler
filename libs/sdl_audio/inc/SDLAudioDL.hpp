@@ -4,7 +4,7 @@
 
 #include <SDL2/SDL.h>
 
-class	SDLAudioDL : public AudioDL
+struct	SDLAudioDL : public AudioDL
 {
 	public:
 		SDLAudioDL() {}

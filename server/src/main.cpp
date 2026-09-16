@@ -31,10 +31,8 @@
 // #pragma once
 
 #include <ctime>
-// #include <iostream>
-// #include <string>
 
-class	Chrono
+struct	Chrono
 {
 	public:
 		Chrono()
@@ -69,7 +67,7 @@ class	Chrono
 
 
 
-class	Server
+struct	Server
 {
 	public:
 		struct	Client
@@ -626,7 +624,7 @@ class	Server
 		int	_width = 0;
 		int	_height = 0;
 
-        enum class Direction
+        enum struct Direction
         {
             UP,
             DOWN,

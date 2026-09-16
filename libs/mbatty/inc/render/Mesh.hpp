@@ -6,7 +6,7 @@
 
 #include <vector>
 
-class   Mesh
+struct   Mesh
 {
     public:
         struct	VertexLayout

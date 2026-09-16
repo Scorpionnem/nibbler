@@ -35,9 +35,9 @@ struct	TileSave
 	Edges	edges;
 };
 
-class	CACAGraphicsDL : public GraphicsDL
+struct	CACAGraphicsDL : public GraphicsDL
 {
-    friend class Event;
+    friend struct Event;
 
 	public:
 		CACAGraphicsDL() {}

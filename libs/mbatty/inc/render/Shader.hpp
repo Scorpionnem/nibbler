@@ -3,7 +3,7 @@
 #include "math.hpp"
 #include "render/GL.hpp"
 
-class   Shader
+struct   Shader
 {
     public:
         Shader() {}

@@ -5,7 +5,7 @@
 
 #include <vector>
 
-class	Texture
+struct	Texture
 {
 	public:
 		Texture() {}
