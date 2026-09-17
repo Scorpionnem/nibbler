@@ -14,12 +14,18 @@ void    Input::beginFrame()
     _mouseDX = 0.0f;
     _mouseDY = 0.0f;
     _textInput.clear();
+    _lastPressed = -1;
 }
 
 void    Input::press(int action)
 {
     _down[action] = true;
     _pressed[action] = true;
+}
+
+int	Input::lastPressed() const
+{
+	return (_lastPressed);
 }
 
 void    Input::release(int action)

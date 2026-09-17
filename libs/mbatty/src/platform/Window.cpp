@@ -66,7 +66,10 @@ const Input&    Window::pollEvents()
 		if (event.type == SDL_QUIT)
 			_input._close = true;
 		else if (event.type == SDL_KEYDOWN && !event.key.repeat)
+		{
 			_input.press(event.key.keysym.sym);
+			_input._lastPressed = event.key.keysym.sym;
+		}
 		else if (event.type == SDL_KEYUP)
 			_input.release(event.key.keysym.sym);
 		else if (event.type == SDL_MOUSEBUTTONDOWN)

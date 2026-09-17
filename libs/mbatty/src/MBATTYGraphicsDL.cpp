@@ -106,24 +106,27 @@ GraphicsDL::Input	MBATTYGraphicsDL::getInput()
 
 		_cam->aspect = input.aspect();
 
-		if (input.wasPressed(SDLK_w) || input.wasPressed(SDLK_UP))
-			_up_input = true;
-		if (input.wasPressed(SDLK_s) || input.wasPressed(SDLK_DOWN))
-			_down_input = true;
-		if (input.wasPressed(SDLK_a) || input.wasPressed(SDLK_LEFT))
-			_left_input = true;
-		if (input.wasPressed(SDLK_d) || input.wasPressed(SDLK_RIGHT))
-			_right_input = true;
-		if (input.wasPressed(SDLK_ESCAPE) || input.close())
-			_close_input = true;
-		if (input.wasPressed(SDLK_1))
-			_switch1_input = true;
-		if (input.wasPressed(SDLK_2))
-		_switch2_input = true;
-		if (input.wasPressed(SDLK_3))
-		_switch3_input = true;
-		if (input.wasPressed(SDLK_SPACE))
-			_pause_input = true;
+		switch (input.lastPressed())
+		{
+			case SDLK_w: case SDLK_UP:
+				_up_input = true; break;
+			case SDLK_s: case SDLK_DOWN:
+				_down_input = true; break;
+			case SDLK_a: case SDLK_LEFT:
+				_left_input = true; break;
+			case SDLK_d: case SDLK_RIGHT:
+				_right_input = true; break;
+			case SDLK_ESCAPE:
+				_close_input = true; break;
+			case SDLK_1:
+				_switch1_input = true; break;
+			case SDLK_2:
+				_switch2_input = true; break;
+			case SDLK_3:
+				_switch3_input = true; break;
+			case SDLK_SPACE:
+				_pause_input = true; break;
+		}
 	}
 	if (_up_input)
 	{

@@ -25,6 +25,7 @@ struct Input
 
         const std::string   &textInput() const {return (_textInput);};
 
+        int	lastPressed() const;
 	private:
 		void	beginFrame();
 		void	press(int action);
@@ -37,6 +38,8 @@ struct Input
 		float	_mouseDY;
 		int		_mouseX;
 		int		_mouseY;
+
+		int	_lastPressed = -1;
 
         double  _delta;
         double  _aspect;
