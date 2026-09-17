@@ -197,6 +197,7 @@ struct	Server
 									else
 										for (auto& pair : _clients)
 											_sendMap(pair.second.fd);
+									started = true;
 									break;
 								}
 								if (_clients.size() == 1)
@@ -330,6 +331,7 @@ struct	Server
 
 		void    reset()
 		{
+			started = false;
 			_snakes[0].clear();
 			_snakes[1].clear();
 
@@ -414,6 +416,8 @@ struct	Server
 				} while (!_isMapValid());
 			}
 		}
+
+		bool	started = false;
 
 	private:
 		void	_new_connection()
@@ -683,7 +687,7 @@ int	main(int ac, char **av)
 		{
 			server.update();
 
-			if (server.getNbClients() == MAX_CLIENTS && chrono.get() >= 0.2)
+			if (server.started && server.getNbClients() == MAX_CLIENTS && chrono.get() >= 0.2)
 			{
 				if (isFirst)
 				{
