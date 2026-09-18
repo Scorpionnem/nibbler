@@ -4,24 +4,10 @@
 
 struct   Camera
 {
-    mat4f	getViewMatrix()
-    {
-    	return (mat4f::rotateX(radians(-pitch)) * mat4f::rotateY(radians(yaw)) * mat4f::translate(-pos));
-    }
-    mat4f	getProjectionMatrix()
-    {
-        return (mat4f::perspective(fov, aspect, near, far));
-    }
+    mat4f	getViewMatrix();
+    mat4f	getProjectionMatrix();
 
-    vec3f    front() const
-    {
-        float   c = std::cos(radians(pitch));
-
-        return (vec3f(
-            std::sin(radians(yaw)) * c,
-            std::sin(radians(pitch)),
-            -std::cos(radians(yaw)) * c));
-    }
+    vec3f    front() const;
 
     vec3f   pos;
     float  yaw = 0;

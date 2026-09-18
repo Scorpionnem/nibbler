@@ -21,6 +21,10 @@ LFLAGS :=		$(SDL_LIBS) -lGL
 SRCS :=	src/platform/Window.cpp				\
 		src/platform/Input.cpp				\
 		src/render/Shader.cpp				\
+		src/render/Camera.cpp				\
+		src/render/Font.cpp				\
+		src/render/Mesh.cpp				\
+		src/render/Texture.cpp				\
 		src/render/FrameBuffer.cpp			\
 		src/loader/mesh/OBJLoader.cpp		\
 		src/loader/texture/STBLoader.cpp	\

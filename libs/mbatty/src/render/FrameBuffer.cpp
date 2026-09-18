@@ -1,5 +1,31 @@
 #include "render/FrameBuffer.hpp"
 
+FrameBuffer::~FrameBuffer()
+{
+    if (_FBO != 0)
+        glDeleteFramebuffers(1, &_FBO);
+    if (_colorTex != 0)
+        glDeleteTextures(1, &_colorTex);
+    if (_depthTex != 0)
+        glDeleteTextures(1, &_depthTex);
+}
+
+void    FrameBuffer::unbind() const
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void    FrameBuffer::bind() const
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, _FBO);
+    glViewport(0, 0, _width, _height);
+}
+
+void	FrameBuffer::clear()
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 void    FrameBuffer::create(u32 width, u32 height)
 {
     _width = width;
@@ -40,3 +66,13 @@ void    FrameBuffer::resize(u32 width, u32 height)
         glDeleteTextures(1, &_depthTex);
     create(width, height);
 }
+
+void	FrameBuffer::bindColor(u32 unit) {Texture::bind(_colorTex, unit);}
+void	FrameBuffer::bindDepth(u32 unit) {Texture::bind(_depthTex, unit);}
+
+u32     FrameBuffer::colorTexture() const {return (_colorTex);}
+u32     FrameBuffer::depthTexture() const {return (_depthTex);}
+u32     FrameBuffer::width() const {return (_width);}
+u32     FrameBuffer::height() const {return (_height);}
+
+u32     FrameBuffer::id() const {return (_FBO);}

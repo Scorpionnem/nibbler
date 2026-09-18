@@ -19,40 +19,12 @@
 struct	Client
 {
 	public:
-		~Client() {::close(_fd);}
-		void	connect(const char *addr, int port)
-		{
-			struct sockaddr_in	serv_addr;
-
-			_fd = socket(AF_INET, SOCK_STREAM, 0);
-			if (_fd == -1)
-				throw std::runtime_error("socket" + std::string(strerror(errno)));
-
-			serv_addr.sin_family = AF_INET;
-			serv_addr.sin_port = htons(port);
-			if (inet_pton(AF_INET, addr, &serv_addr.sin_addr) == -1)
-				throw std::runtime_error("inet_pton" + std::string(strerror(errno)));
-
-			if (::connect(_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1)
-				throw std::runtime_error("connect" + std::string(strerror(errno)));
-		}
-		ssize_t	recv(uint8_t *data, ssize_t size)
-		{
-			ssize_t	recv_size = ::recv(_fd, data, size, MSG_DONTWAIT);
-			if (recv_size == -1)
-			{
-				if (errno == EAGAIN || errno == EWOULDBLOCK)
-					return (-1);
-				throw std::runtime_error("recv" + std::string(strerror(errno)));
-			}
-			return (recv_size);
-		}
-		void	send(const uint8_t *data, uint64_t size)
-		{
-			::send(_fd, data, size, MSG_DONTWAIT);
-		}
+		~Client();
+		void	connect(const char *addr, int port);
+		ssize_t	recv(uint8_t *data, ssize_t size);
+		void	send(const uint8_t *data, uint64_t size);
 	private:
-		int	_fd;
+		int	_fd = -1;
 };
 
 #include <ctime>
@@ -60,29 +32,12 @@ struct	Client
 struct	Chrono
 {
 	public:
-		Chrono()
-		{
-			start();
-		}
+		Chrono();
 		~Chrono() {}
 
-		void	start()
-		{
-			_start = getTime();
-		}
-		double	get()
-		{
-			return (getTime() - _start);
-		}
-
-		static double getTime()
-		{
-			double	res;
-			struct timespec	current;
-			clock_gettime(CLOCK_MONOTONIC, &current);
-			res = (current.tv_sec) + (current.tv_nsec) * 1e-9;
-			return (res);
-		}
+		void	start();
+		double	get();
+		static double getTime();
 	private:
 		double		_start = 0;
 };
@@ -90,9 +45,6 @@ struct	Chrono
 struct   Nibbler
 {
     public:
-        Nibbler() {}
-        ~Nibbler() {}
-
         int		play(int width, int height);
 		int		playOnline(int width, int height, const std::string &port);
 

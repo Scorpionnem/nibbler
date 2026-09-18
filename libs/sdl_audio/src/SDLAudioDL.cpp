@@ -53,6 +53,7 @@ void	SDLAudioDL::stop()
 		SDL_FreeWAV(moveWavBuffer);
 	if (eatWavBuffer)
 		SDL_FreeWAV(eatWavBuffer);
+	SDL_CloseAudioDevice(deviceId);
 	if (SDL_WasInit(SDL_INIT_AUDIO))
 		SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }

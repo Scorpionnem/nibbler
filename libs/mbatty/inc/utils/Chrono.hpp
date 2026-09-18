@@ -7,29 +7,12 @@
 struct	Chrono
 {
 	public:
-		Chrono()
-		{
-			start();
-		}
-		~Chrono() {}
+		Chrono();
 
-		void	start()
-		{
-			_start = getTime();
-		}
-		double	get()
-		{
-			return (getTime() - _start);
-		}
+		void	start();
+		double	get();
 
-		static double getTime()
-		{
-			double	res;
-			struct timespec	current;
-			clock_gettime(CLOCK_MONOTONIC, &current);
-			res = (current.tv_sec) + (current.tv_nsec) * 1e-9;
-			return (res);
-		}
+		static double getTime();
 	private:
 		double		_start = 0;
 };
