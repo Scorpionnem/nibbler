@@ -56,8 +56,8 @@ void    Window::close()
 const Input&    Window::pollEvents()
 {
     _input._aspect = static_cast<double>(_width) / static_cast<double>(_height);
-    _input._delta = _time.get() - lastFrameTime;
-    lastFrameTime = _time.get();
+    _input._delta = 0;
+    lastFrameTime = 0;
 	SDL_Event   event;
 
 	_input.beginFrame();

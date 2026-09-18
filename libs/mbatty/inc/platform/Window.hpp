@@ -3,7 +3,6 @@
 #include "math.hpp"
 #include "platform/Input.hpp"
 #include "render/GL.hpp"
-#include "utils/Chrono.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -40,8 +39,6 @@ struct Window
         void    _createGLContext();
 
         Input       _input;
-
-        Chrono      _time;
 
 		SDL_Window* _window = nullptr;
         void*       _glContext = nullptr;
